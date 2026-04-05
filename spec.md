@@ -48,6 +48,8 @@ alerts, or portfolio features.
 
 - Framework: Svelte
 - Component system: `https://www.shadcn-svelte.com/`
+- Preset starting point:
+  `https://www.shadcn-svelte.com/create/preview-02?preset=b78QWyu5vU`
 - Charting library: TradingView Lightweight Charts
 - Primary views:
   - price series

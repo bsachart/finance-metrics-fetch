@@ -16,6 +16,8 @@ data in a lightweight web UI.
 - Run scheduled and manual fetch workflows from GitHub Actions
 - Visualize price, quote-volume histograms, and VIX context in a Svelte UI
   built with `https://www.shadcn-svelte.com/`
+- Start the UI from the shadcn-svelte preset:
+  `https://www.shadcn-svelte.com/create/preview-02?preset=b78QWyu5vU`
 
 ## Documentation
 
