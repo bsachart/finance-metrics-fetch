@@ -1,0 +1,56 @@
+name: Refresh Market Data
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 */2 * * *"
+    # Daily alternative:
+    # - cron: "0 6 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        run: python -m pip install uv
+
+      - name: Sync Python dependencies
+        run: uv sync
+
+      - name: Refresh market and constituent datasets
+        run: uv run python -m finance_metrics_fetch.cli refresh --config config/tickers.json
+
+      - name: Check for repository changes
+        id: changes
+        run: |
+          if git diff --quiet -- data config; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit refreshed data
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data config
+          git commit -m "chore: refresh market data"
+
+      - name: Push refreshed data
+        if: steps.changes.outputs.changed == 'true'
+        run: git push
