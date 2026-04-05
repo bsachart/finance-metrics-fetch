@@ -58,16 +58,22 @@ describe("page load", () => {
     });
 
     const result = (await load({ fetch: fetchFn } as never)) as {
-      dashboard: { indexOptions: Array<{ key: string }>; status: { status: string }; vixSymbol: string | null };
+      dashboard: {
+        filterMembershipBySymbol: Record<string, string[]>;
+        indexOptions: Array<{ key: string }>;
+        status: { status: string };
+        vixSymbol: string | null;
+      };
       defaultSymbol: string;
     };
 
     expect(result.defaultSymbol).toBe("VOO");
     expect(result.dashboard.vixSymbol).toBe("^VIX");
     expect(result.dashboard.indexOptions.map((option) => option.key)).toEqual([
-      "nasdaq100",
       "sp500",
+      "nasdaq100",
     ]);
+    expect(result.dashboard.filterMembershipBySymbol.VOO).toEqual(["all", "sp500"]);
     expect(result.dashboard.status.status).toBe("success");
   });
 });

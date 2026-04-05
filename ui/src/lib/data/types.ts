@@ -75,6 +75,33 @@ export interface SymbolOption {
   hasMarketData: boolean;
 }
 
+export type TickerFilterKey = "all" | "sp500" | "nasdaq100";
+
+export interface TickerFilterOption {
+  key: TickerFilterKey;
+  label: string;
+  symbolCount: number;
+}
+
+export interface TickerListEntry {
+  symbol: string;
+  label: string;
+  role: string;
+  filterKeys: TickerFilterKey[];
+  isActive: boolean;
+  isRecent: boolean;
+  lastClose: number | null;
+  lastChange: number | null;
+  trendPoints: number[];
+}
+
+export interface TickerDiscoveryState {
+  activeFilter: TickerFilterKey;
+  entries: TickerListEntry[];
+  filterOptions: TickerFilterOption[];
+  recentEntries: TickerListEntry[];
+}
+
 export interface IndexOption {
   key: string;
   label: string;
@@ -96,4 +123,5 @@ export interface DashboardData {
   marketBySymbol: Record<string, MarketPoint[]>;
   vixSymbol: string | null;
   constituentsByIndex: Record<string, ConstituentRecord[]>;
+  filterMembershipBySymbol: Record<string, TickerFilterKey[]>;
 }

@@ -4,12 +4,22 @@ import {
   loadMarketCsv,
   loadStatus,
 } from "./loaders";
-import type { DashboardData, SymbolOption } from "./types";
+import type {
+  DashboardData,
+  MarketPoint,
+  SymbolOption,
+  TickerDiscoveryState,
+  TickerFilterKey,
+  TickerFilterOption,
+  TickerListEntry,
+} from "./types";
 
 export interface DashboardPayload {
   dashboard: DashboardData;
   warnings: string[];
 }
+
+export const RECENT_TICKER_LIMIT = 8;
 
 async function tryLoadMarketSymbol(
   fetchFn: typeof fetch,
@@ -108,12 +118,20 @@ export async function loadDashboardData(
   const vixTicker = enabledTickers.find(
     (ticker) => ticker.role === "volatility" || ticker.symbol === "^VIX",
   );
+  const filterMembershipBySymbol = buildFilterMembershipBySymbol(
+    symbolOptions,
+    orderedIndices.map((index) => ({
+      key: index.key,
+      records: index.records,
+    })),
+  );
 
   return {
     dashboard: {
       constituentsByIndex: Object.fromEntries(
         orderedIndices.map((index) => [index.key, index.records]),
       ),
+      filterMembershipBySymbol,
       indexOptions: orderedIndices.map((index) => ({
         key: index.key,
         label: index.label,
@@ -129,24 +147,12 @@ export async function loadDashboardData(
   };
 }
 
-function rankSymbolOption(option: SymbolOption): number {
-  if (option.symbol === "VOO") {
-    return 0;
-  }
-
-  if (option.role === "volatility" || option.symbol === "^VIX") {
-    return 2;
-  }
-
-  return 1;
-}
-
 function rankIndexOption(key: string): number {
-  if (key === "nasdaq100") {
+  if (key === "sp500") {
     return 0;
   }
 
-  if (key === "sp500") {
+  if (key === "nasdaq100") {
     return 1;
   }
 
@@ -159,4 +165,237 @@ export function getDefaultSymbol(dashboard: DashboardData): string | null {
   );
 
   return preferred?.symbol ?? dashboard.symbolOptions.find((option) => option.hasMarketData)?.symbol ?? null;
+}
+
+export function sanitizeRecentSymbols(
+  dashboard: DashboardData,
+  recentSymbols: string[],
+): string[] {
+  const validSymbols = new Set(
+    dashboard.symbolOptions
+      .filter((option) => option.hasMarketData && option.symbol !== dashboard.vixSymbol)
+      .map((option) => option.symbol),
+  );
+
+  return Array.from(
+    new Set(recentSymbols.filter((symbol) => validSymbols.has(symbol))),
+  ).slice(0, RECENT_TICKER_LIMIT);
+}
+
+export function pushRecentSymbol(
+  dashboard: DashboardData,
+  recentSymbols: string[],
+  symbol: string,
+): string[] {
+  return sanitizeRecentSymbols(dashboard, [symbol, ...recentSymbols]);
+}
+
+export function buildTickerDiscoveryState(
+  dashboard: DashboardData,
+  searchQuery: string,
+  activeFilter: TickerFilterKey,
+  selectedSymbol: string | null,
+  recentSymbols: string[],
+): TickerDiscoveryState {
+  const validRecentSymbols = sanitizeRecentSymbols(dashboard, recentSymbols);
+  const recentSet = new Set(validRecentSymbols);
+  const query = searchQuery.trim().toLowerCase();
+  const filterOptions = buildTickerFilterOptions(dashboard);
+  const supportedFilterKeys = new Set(filterOptions.map((option) => option.key));
+  const normalizedFilter = supportedFilterKeys.has(activeFilter) ? activeFilter : "all";
+
+  const allEntries = dashboard.symbolOptions
+    .filter((option) => option.hasMarketData && option.symbol !== dashboard.vixSymbol)
+    .map((option) =>
+      buildTickerListEntry(
+        option,
+        dashboard.marketBySymbol[option.symbol] ?? [],
+        dashboard.filterMembershipBySymbol[option.symbol] ?? ["all"],
+        option.symbol === selectedSymbol,
+        recentSet.has(option.symbol),
+      ),
+    );
+
+  const entries = allEntries
+    .filter((entry) => entry.filterKeys.includes(normalizedFilter))
+    .filter((entry) => matchesTickerQuery(entry, query))
+    .sort((left, right) => compareTickerEntries(left, right, query));
+
+  const entryBySymbol = new Map(allEntries.map((entry) => [entry.symbol, entry]));
+  const recentEntries = validRecentSymbols
+    .map((symbol) => entryBySymbol.get(symbol))
+    .filter((entry): entry is TickerListEntry => Boolean(entry));
+
+  return {
+    activeFilter: normalizedFilter,
+    entries,
+    filterOptions,
+    recentEntries,
+  };
+}
+
+function buildFilterMembershipBySymbol(
+  symbolOptions: SymbolOption[],
+  loadedIndices: Array<{ key: string; records: Array<{ symbol: string }> }>,
+): Record<string, TickerFilterKey[]> {
+  const sp500Symbols = new Set(
+    loadedIndices.find((index) => index.key === "sp500")?.records.map((record) => record.symbol) ?? [],
+  );
+  const nasdaq100Symbols = new Set(
+    loadedIndices.find((index) => index.key === "nasdaq100")?.records.map((record) => record.symbol) ?? [],
+  );
+
+  return Object.fromEntries(
+    symbolOptions.map((option) => {
+      const keys: TickerFilterKey[] = ["all"];
+
+      if (sp500Symbols.has(option.symbol)) {
+        keys.push("sp500");
+      }
+
+      if (nasdaq100Symbols.has(option.symbol)) {
+        keys.push("nasdaq100");
+      }
+
+      return [option.symbol, keys];
+    }),
+  );
+}
+
+function buildTickerFilterOptions(dashboard: DashboardData): TickerFilterOption[] {
+  const marketSymbols = dashboard.symbolOptions.filter(
+    (option) => option.hasMarketData && option.symbol !== dashboard.vixSymbol,
+  );
+
+  const counts = {
+    all: marketSymbols.length,
+    nasdaq100: 0,
+    sp500: 0,
+  };
+
+  for (const option of marketSymbols) {
+    for (const key of dashboard.filterMembershipBySymbol[option.symbol] ?? []) {
+      if (key === "nasdaq100" || key === "sp500") {
+        counts[key] += 1;
+      }
+    }
+  }
+
+  const options: TickerFilterOption[] = [
+    { key: "all", label: "All", symbolCount: counts.all },
+  ];
+
+  if (counts.sp500 > 0) {
+    options.push({ key: "sp500", label: "S&P 500", symbolCount: counts.sp500 });
+  }
+
+  if (counts.nasdaq100 > 0) {
+    options.push({
+      key: "nasdaq100",
+      label: "Nasdaq-100",
+      symbolCount: counts.nasdaq100,
+    });
+  }
+
+  return options.sort((left, right) => rankFilterOption(left.key) - rankFilterOption(right.key));
+}
+
+function buildTickerListEntry(
+  option: SymbolOption,
+  points: MarketPoint[],
+  filterKeys: TickerFilterKey[],
+  isActive: boolean,
+  isRecent: boolean,
+): TickerListEntry {
+  const latest = points.at(-1) ?? null;
+  const previous = points.at(-2) ?? null;
+
+  return {
+    filterKeys,
+    isActive,
+    isRecent,
+    label: option.label,
+    lastChange:
+      latest && previous ? latest.close - previous.close : null,
+    lastClose: latest?.close ?? null,
+    role: option.role,
+    symbol: option.symbol,
+    trendPoints: points.slice(-20).map((point) => point.close),
+  };
+}
+
+function matchesTickerQuery(entry: TickerListEntry, query: string): boolean {
+  if (!query) {
+    return true;
+  }
+
+  return (
+    entry.symbol.toLowerCase().includes(query) ||
+    entry.label.toLowerCase().includes(query)
+  );
+}
+
+function compareTickerEntries(
+  left: TickerListEntry,
+  right: TickerListEntry,
+  query: string,
+): number {
+  const matchDifference = rankSearchMatch(left, query) - rankSearchMatch(right, query);
+  if (matchDifference !== 0) {
+    return matchDifference;
+  }
+
+  const rankDifference = rankSymbolOption(left) - rankSymbolOption(right);
+  return rankDifference !== 0 ? rankDifference : left.symbol.localeCompare(right.symbol);
+}
+
+function rankSearchMatch(entry: TickerListEntry, query: string): number {
+  if (!query) {
+    return 4;
+  }
+
+  const symbol = entry.symbol.toLowerCase();
+  const label = entry.label.toLowerCase();
+
+  if (symbol === query) {
+    return 0;
+  }
+
+  if (symbol.startsWith(query)) {
+    return 1;
+  }
+
+  if (label.startsWith(query)) {
+    return 2;
+  }
+
+  if (label.includes(query)) {
+    return 3;
+  }
+
+  return 4;
+}
+
+function rankFilterOption(key: TickerFilterKey): number {
+  if (key === "all") {
+    return 0;
+  }
+
+  if (key === "sp500") {
+    return 1;
+  }
+
+  return 2;
+}
+
+function rankSymbolOption(option: Pick<SymbolOption, "symbol" | "role">): number {
+  if (option.symbol === "VOO") {
+    return 0;
+  }
+
+  if (option.role === "volatility" || option.symbol === "^VIX") {
+    return 2;
+  }
+
+  return 1;
 }

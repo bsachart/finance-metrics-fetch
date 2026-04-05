@@ -1,8 +1,10 @@
 <script lang="ts">
   import {
+    AreaSeries,
+    type AutoscaleInfo,
+    type AutoscaleInfoProvider,
     CandlestickSeries,
     HistogramSeries,
-    LineSeries,
     createChart,
     type IChartApi,
     type MouseEventParams,
@@ -32,14 +34,25 @@
   } | null;
 
   const inkColor = "#13212f";
-  const vixColor = "#7c5cff";
+  const mutedVixColor = "#7c5cff";
+  const elevatedVixColor = "#d97706";
+  const elevatedVixThreshold = 20;
+  const vixAutoscaleInfoProvider: AutoscaleInfoProvider = (
+    original: () => AutoscaleInfo | null,
+  ) => {
+    const result = original();
+    if (result?.priceRange) {
+      result.priceRange.minValue = 0;
+    }
+    return result;
+  };
 
   let wrapper: HTMLDivElement;
   let host: HTMLDivElement;
   let chart: IChartApi | null = null;
   let priceSeries: ISeriesApi<"Candlestick"> | null = null;
   let volumeSeries: ISeriesApi<"Histogram"> | null = null;
-  let vixSeries: ISeriesApi<"Line"> | null = null;
+  let vixSeries: ISeriesApi<"Area"> | null = null;
   let hoverState: HoverState = null;
   let mounted = false;
 
@@ -56,6 +69,7 @@
     hoverState = null;
 
     const showVixPane = showVix && vixPoints.length > 0;
+    const vixColor = getVixColor(vixPoints);
     chart = createChart(host, {
       autoSize: true,
       crosshair: {
@@ -88,11 +102,11 @@
     priceSeries = chart.addSeries(
       CandlestickSeries,
       {
-        downColor: "#f43f5e",
+        downColor: showVixPane ? "rgba(244, 63, 94, 0.82)" : "#f43f5e",
         borderVisible: false,
-        wickDownColor: "#f43f5e",
-        upColor: "#0f766e",
-        wickUpColor: "#0f766e",
+        wickDownColor: showVixPane ? "rgba(244, 63, 94, 0.82)" : "#f43f5e",
+        upColor: showVixPane ? "rgba(15, 118, 110, 0.82)" : "#0f766e",
+        wickUpColor: showVixPane ? "rgba(15, 118, 110, 0.82)" : "#0f766e",
       },
       0,
     );
@@ -114,17 +128,20 @@
 
     vixSeries = showVixPane
       ? chart.addSeries(
-          LineSeries,
+          AreaSeries,
           {
-            color: vixColor,
             crosshairMarkerBorderColor: vixColor,
             crosshairMarkerBackgroundColor: "#ffffff",
             crosshairMarkerRadius: 4,
             lastValueVisible: false,
+            lineColor: vixColor,
             lineWidth: 2,
             priceLineVisible: false,
             priceScaleId: "left",
+            topColor: withOpacity(vixColor, 0.16),
+            bottomColor: withOpacity(vixColor, 0.04),
             title: "VIX",
+            autoscaleInfoProvider: vixAutoscaleInfoProvider,
           },
           1,
         )
@@ -167,6 +184,7 @@
 
     const volumeScale = getVolumeScale(points);
     const hasVix = showVix && vixPoints.length > 0;
+    const vixColor = getVixColor(vixPoints);
 
     priceSeries.setData(buildCandlestickSeries(points));
     volumeSeries.applyOptions({
@@ -177,6 +195,11 @@
       },
     });
     volumeSeries.setData(buildNormalizedQuoteVolumeSeries(points, volumeScale));
+    vixSeries?.applyOptions({
+      lineColor: vixColor,
+      topColor: withOpacity(vixColor, 0.16),
+      bottomColor: withOpacity(vixColor, 0.04),
+    });
     vixSeries?.setData(hasVix ? buildPriceSeries(vixPoints) : []);
     chart.timeScale().fitContent();
   }
@@ -216,6 +239,20 @@
       maximumFractionDigits: value >= 100 ? 2 : 2,
       minimumFractionDigits: 0,
     });
+  }
+
+  function getVixColor(seriesPoints: MarketPoint[]): string {
+    return (seriesPoints.at(-1)?.close ?? 0) >= elevatedVixThreshold
+      ? elevatedVixColor
+      : mutedVixColor;
+  }
+
+  function withOpacity(hexColor: string, opacity: number): string {
+    const normalized = hexColor.replace("#", "");
+    const red = Number.parseInt(normalized.slice(0, 2), 16);
+    const green = Number.parseInt(normalized.slice(2, 4), 16);
+    const blue = Number.parseInt(normalized.slice(4, 6), 16);
+    return `rgba(${red}, ${green}, ${blue}, ${opacity})`;
   }
 
   function formatTime(time: Time): string {

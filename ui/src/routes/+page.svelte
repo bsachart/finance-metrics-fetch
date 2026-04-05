@@ -3,8 +3,11 @@
   import PriceChart from "$charts/price-chart.svelte";
   import ConstituentTable from "$components/constituent-table.svelte";
   import EmptyState from "$components/empty-state.svelte";
+  import RecentTickers from "$components/recent-tickers.svelte";
   import StatusCard from "$components/status-card.svelte";
-  import SymbolSelector from "$components/symbol-selector.svelte";
+  import TickerFilters from "$components/ticker-filters.svelte";
+  import TickerList from "$components/ticker-list.svelte";
+  import TickerSearch from "$components/ticker-search.svelte";
   import {
     AGGREGATION_PERIODS,
     LOOKBACK_PRESETS,
@@ -13,7 +16,12 @@
     type AggregationPeriod,
     type LookbackPreset,
   } from "$data/market";
-  import type { DashboardSection } from "$data/types";
+  import {
+    buildTickerDiscoveryState,
+    pushRecentSymbol,
+    sanitizeRecentSymbols,
+  } from "$data/dashboard";
+  import type { DashboardSection, TickerFilterKey } from "$data/types";
   import {
     Alert,
     AlertDescription,
@@ -32,8 +40,11 @@
 
   type DashboardPreferences = {
     activeSection?: DashboardSection;
+    activeFilter?: TickerFilterKey;
+    recentSymbols?: string[];
     selectedAggregation?: AggregationPeriod;
     selectedIndex?: string;
+    selectedIndexPreference?: string;
     selectedLookback?: LookbackPreset;
     selectedSymbol?: string | null;
     showVix?: boolean;
@@ -41,13 +52,23 @@
 
   let selectedSymbol = data.defaultSymbol;
   let activeSection: DashboardSection = "tickers";
-  let selectedIndex = data.dashboard.indexOptions[0]?.key ?? "";
+  let activeFilter: TickerFilterKey = "all";
+  let recentSymbols: string[] = [];
+  let searchQuery = "";
+  let selectedIndex = getDefaultIndexKey();
   let selectedLookback: LookbackPreset = "1M";
   let selectedAggregation: AggregationPeriod = "1D";
   let showVix = true;
   let hasLoadedPreferences = false;
   let vixToggleId = "show-vix";
 
+  $: snapshotDate = new Date(data.dashboard.status.finished_at);
+  $: snapshotDayLabel = snapshotDate.toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
   $: rawMarketPoints = selectedSymbol ? data.dashboard.marketBySymbol[selectedSymbol] ?? [] : [];
   $: marketPoints = applyMarketView(rawMarketPoints, selectedLookback, selectedAggregation);
   $: vixPoints = data.dashboard.vixSymbol
@@ -66,9 +87,14 @@
   );
   $: selectedSymbolOption =
     data.dashboard.symbolOptions.find((option) => option.symbol === selectedSymbol) ?? null;
-  $: tickerOptions = data.dashboard.symbolOptions.filter(
-    (option) => option.symbol !== data.dashboard.vixSymbol,
+  $: tickerDiscovery = buildTickerDiscoveryState(
+    data.dashboard,
+    searchQuery,
+    activeFilter,
+    selectedSymbol,
+    recentSymbols,
   );
+  $: recentSymbols = sanitizeRecentSymbols(data.dashboard, recentSymbols);
   $: hasAnyVixData = Boolean(data.dashboard.vixSymbol && vixPoints.length > 0);
   $: showVixOverlay = shouldDisplayVixOverlay(
     selectedSymbol,
@@ -85,15 +111,22 @@
       .map((option) => option.key),
   );
   $: if (!selectedIndex || !availableIndices.has(selectedIndex)) {
-    selectedIndex =
-      data.dashboard.indexOptions.find((option) => option.hasConstituents)?.key ?? "";
+    selectedIndex = getDefaultIndexKey();
   }
+  $: hasStatusIssues =
+    data.dashboard.status.status !== "success" ||
+    data.dashboard.status.failed_symbols.length > 0 ||
+    data.dashboard.status.messages.length > 0;
   $: if (hasLoadedPreferences) {
     savePreferences();
   }
 
   onMount(() => {
     restorePreferences();
+    recentSymbols = sanitizeRecentSymbols(data.dashboard, recentSymbols);
+    if (selectedSymbol) {
+      recentSymbols = pushRecentSymbol(data.dashboard, recentSymbols, selectedSymbol);
+    }
     hasLoadedPreferences = true;
 
     const intervalId = window.setInterval(() => {
@@ -127,6 +160,14 @@
         activeSection = preferences.activeSection;
       }
 
+      if (
+        preferences.activeFilter === "all" ||
+        preferences.activeFilter === "sp500" ||
+        preferences.activeFilter === "nasdaq100"
+      ) {
+        activeFilter = preferences.activeFilter;
+      }
+
       if (preferences.selectedLookback && LOOKBACK_PRESETS.includes(preferences.selectedLookback)) {
         selectedLookback = preferences.selectedLookback;
       }
@@ -146,8 +187,19 @@
         selectedSymbol = preferences.selectedSymbol;
       }
 
-      if (preferences.selectedIndex && availableIndices.has(preferences.selectedIndex)) {
-        selectedIndex = preferences.selectedIndex;
+      if (
+        preferences.selectedIndexPreference &&
+        availableIndices.has(preferences.selectedIndexPreference)
+      ) {
+        selectedIndex = preferences.selectedIndexPreference;
+      } else if (preferences.selectedIndex && availableIndices.has(preferences.selectedIndex)) {
+        selectedIndex = getDefaultIndexKey();
+      }
+
+      if (Array.isArray(preferences.recentSymbols)) {
+        recentSymbols = preferences.recentSymbols.filter(
+          (symbol): symbol is string => typeof symbol === "string",
+        );
       }
     } catch {
       window.localStorage.removeItem(storageKey);
@@ -157,14 +209,32 @@
   function savePreferences(): void {
     const preferences: DashboardPreferences = {
       activeSection,
+      activeFilter: tickerDiscovery.activeFilter,
+      recentSymbols,
       selectedAggregation,
-      selectedIndex,
+      selectedIndexPreference: selectedIndex,
       selectedLookback,
       selectedSymbol,
       showVix,
     };
 
     window.localStorage.setItem(storageKey, JSON.stringify(preferences));
+  }
+
+  function selectSymbol(symbol: string): void {
+    selectedSymbol = symbol;
+    recentSymbols = pushRecentSymbol(data.dashboard, recentSymbols, symbol);
+    searchQuery = "";
+  }
+
+  function getDefaultIndexKey(): string {
+    return (
+      data.dashboard.indexOptions.find(
+        (option) => option.hasConstituents && option.key === "sp500",
+      )?.key ??
+      data.dashboard.indexOptions.find((option) => option.hasConstituents)?.key ??
+      ""
+    );
   }
 </script>
 
@@ -187,6 +257,26 @@
         Repository-backed ticker analysis and market constituent browsing.
       </p>
     </div>
+
+    {#if activeSection === "tickers"}
+      <div class="rounded-[20px] border bg-card/80 px-4 py-3 text-sm shadow-[0_12px_32px_rgba(18,26,33,0.08)]">
+        <p class="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+          Data last updated
+        </p>
+        <p class="mt-1 font-medium">
+          {snapshotDate.toLocaleString()}
+        </p>
+      </div>
+    {:else}
+      <div class="rounded-[20px] border bg-card/80 px-4 py-3 text-sm shadow-[0_12px_32px_rgba(18,26,33,0.08)]">
+        <p class="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+          Snapshot day
+        </p>
+        <p class="mt-1 font-medium">
+          {snapshotDayLabel}
+        </p>
+      </div>
+    {/if}
   </header>
 
   <section class="grid gap-4">
@@ -213,20 +303,34 @@
               </div>
             </div>
 
-            <div class="space-y-3">
-              <div>
-                <p class="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                  Symbols
-                </p>
-                <SymbolSelector bind:selectedSymbol options={tickerOptions} />
-              </div>
+            <div class="space-y-5">
+              <TickerSearch
+                bind:query={searchQuery}
+                entries={tickerDiscovery.entries}
+                {selectedSymbol}
+                onSelect={selectSymbol}
+              />
+
+              <RecentTickers
+                entries={tickerDiscovery.recentEntries}
+                {selectedSymbol}
+                onSelect={selectSymbol}
+              />
+
+              <TickerFilters
+                activeFilter={tickerDiscovery.activeFilter}
+                options={tickerDiscovery.filterOptions}
+                onSelect={(key) => {
+                  activeFilter = key;
+                }}
+              />
 
               <div class="rounded-[22px] border bg-background/55 p-4">
-                <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-                  <div class="grid gap-4 md:grid-cols-3">
+                <div class="flex flex-col gap-5">
+                  <div class="grid gap-4 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,0.8fr)_auto]">
                     <div>
                       <p class="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                        Lookback
+                        Timeframe
                       </p>
                       <div class="flex flex-wrap gap-2">
                         {#each LOOKBACK_PRESETS as lookback}
@@ -244,16 +348,17 @@
                         {/each}
                       </div>
                     </div>
+
                     <div>
                       <p class="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                        Bar Period
+                        Bars
                       </p>
                       <div class="flex flex-wrap gap-2">
                         {#each AGGREGATION_PERIODS as aggregation}
                           <button
                             class={`rounded-full border px-3 py-1.5 text-sm transition ${
                               aggregation === selectedAggregation
-                                ? "border-ring bg-accent/70 text-foreground"
+                                ? "border-ring bg-accent/55 text-foreground"
                                 : "bg-background/70 text-muted-foreground hover:border-ring/40 hover:text-foreground"
                             }`}
                             on:click={() => (selectedAggregation = aggregation)}
@@ -264,6 +369,7 @@
                         {/each}
                       </div>
                     </div>
+
                     <div>
                       <p class="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
                         VIX
@@ -299,20 +405,15 @@
                     </div>
                   </div>
 
-                  <div class="rounded-[20px] border border-dashed bg-background/55 px-4 py-3 xl:max-w-xs">
-                    <p class="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                      Volatility
-                    </p>
-                    <p class="mt-1 text-sm text-muted-foreground">
-                      {#if showVixOverlay}
-                        {data.dashboard.vixSymbol} is shown in its own pane below price.
-                      {:else if hasAnyVixData}
-                        {data.dashboard.vixSymbol} is hidden.
-                      {:else}
-                        VIX data is unavailable in the published snapshot.
-                      {/if}
-                    </p>
-                  </div>
+                  <p class="text-sm text-muted-foreground">
+                    {#if showVixOverlay}
+                      {data.dashboard.vixSymbol} is shown as chart context for {selectedSymbol}.
+                    {:else if hasAnyVixData}
+                      {data.dashboard.vixSymbol} is hidden.
+                    {:else}
+                      VIX data is unavailable in the published snapshot.
+                    {/if}
+                  </p>
                 </div>
               </div>
             </div>
@@ -324,6 +425,21 @@
                 vixPoints={showVixOverlay ? vixPoints : []}
               />
             {/key}
+          </Card>
+
+          <Card class="space-y-4 rounded-[28px] border bg-card/90 p-6 shadow-[0_18px_50px_rgba(18,26,33,0.12)]">
+            <div>
+              <h3 class="font-heading text-lg font-semibold tracking-tight">Published tickers</h3>
+              <p class="mt-1 text-sm text-muted-foreground">
+                Search and scan the current published ticker universe in a compact list.
+              </p>
+            </div>
+
+            <TickerList
+              entries={tickerDiscovery.entries}
+              {selectedSymbol}
+              onSelect={selectSymbol}
+            />
           </Card>
 
           {#if data.warnings.length > 0}
@@ -341,7 +457,9 @@
             </Alert>
           {/if}
 
-          <StatusCard status={data.dashboard.status} />
+          {#if hasStatusIssues}
+            <StatusCard status={data.dashboard.status} />
+          {/if}
         </TabsContent>
 
         <TabsContent class="mt-0 grid gap-4" value="constituents">
@@ -353,6 +471,9 @@
                 </h2>
                 <p class="mt-2 text-sm text-muted-foreground">
                   Browse the latest published index memberships separately from ticker analysis.
+                </p>
+                <p class="mt-1 text-sm text-muted-foreground">
+                  Snapshot day: {snapshotDayLabel}
                 </p>
               </div>
 

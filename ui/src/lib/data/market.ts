@@ -130,7 +130,7 @@ export function buildNormalizedQuoteVolumeSeries(
 ): HistogramData[] {
   return sortMarketPoints(points).map((point) => ({
     color:
-      point.close >= point.open ? "rgba(15, 118, 110, 0.62)" : "rgba(220, 38, 38, 0.58)",
+      point.close >= point.open ? "rgba(59, 130, 246, 0.58)" : "rgba(148, 163, 184, 0.52)",
     time: toBusinessDay(point.date),
     value: point.quote_volume / scale.divisor,
   }));
