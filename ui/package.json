@@ -1,0 +1,31 @@
+{
+  "name": "finance-metrics-fetch-ui",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "sync-data": "node scripts/copy-data.mjs",
+    "dev": "npm run sync-data && vite dev",
+    "build": "npm run sync-data && vite build",
+    "preview": "vite preview",
+    "check": "npm run sync-data && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "test": "npm run sync-data && svelte-kit sync && vitest run"
+  },
+  "dependencies": {
+    "@sveltejs/adapter-static": "^3.0.10",
+    "@sveltejs/kit": "^2.56.1",
+    "@sveltejs/vite-plugin-svelte": "^7.0.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/svelte": "^5.3.1",
+    "@types/node": "^25.5.2",
+    "@types/papaparse": "^5.5.2",
+    "jsdom": "^29.0.1",
+    "lightweight-charts": "^5.1.0",
+    "papaparse": "^5.5.3",
+    "svelte": "^5.55.1",
+    "svelte-check": "^4.4.6",
+    "typescript": "^6.0.2",
+    "vite": "^8.0.3",
+    "vitest": "^4.1.2"
+  }
+}

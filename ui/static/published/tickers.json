@@ -1,0 +1,39 @@
+{
+  "tickers": [
+    {
+      "symbol": "VOO",
+      "label": "Vanguard S&P 500 ETF",
+      "enabled": true,
+      "role": "benchmark",
+      "source": "yahoo_finance"
+    },
+    {
+      "symbol": "^VIX",
+      "label": "CBOE Volatility Index",
+      "enabled": true,
+      "role": "volatility",
+      "source": "yahoo_finance"
+    },
+    {
+      "symbol": "VIRT",
+      "label": "Virtu Financial",
+      "enabled": true,
+      "role": "asset",
+      "source": "yahoo_finance"
+    },
+    {
+      "symbol": "GOOGL",
+      "label": "Alphabet Class A",
+      "enabled": true,
+      "role": "asset",
+      "source": "yahoo_finance"
+    },
+    {
+      "symbol": "MSFT",
+      "label": "Microsoft",
+      "enabled": true,
+      "role": "asset",
+      "source": "yahoo_finance"
+    }
+  ]
+}

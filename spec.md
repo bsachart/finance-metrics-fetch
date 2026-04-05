@@ -4,7 +4,7 @@
 
 Build a simple toolchain that extracts OHLCV market data from Yahoo Finance and
 ticker lists from Wikipedia, stores the results in plain files, and presents
-them in a web UI focused on quote volume, price, and volatility context.
+them in a static UI focused on quote volume, price, and volatility context.
 
 ## Product Direction
 
@@ -51,10 +51,13 @@ alerts, or portfolio features.
 - Preset starting point:
   `https://www.shadcn-svelte.com/create/preview-02?preset=b78QWyu5vU`
 - Charting library: TradingView Lightweight Charts
+- Hosting target: GitHub Pages
+- Data source: packaged copies of repository files from `data/` and `config/tickers.json`
 - Primary views:
   - price series
   - quote-volume histogram
   - VIX context series
+  - constituent reference tables
 - Initial UX goal: fast comparison and simple filtering, not a dense analytics
   workstation
 
@@ -68,7 +71,7 @@ data/
   constituents/
 scripts/
   fetch/
-web/
+ui/
   src/
 ```
 

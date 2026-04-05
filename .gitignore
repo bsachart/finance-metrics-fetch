@@ -27,7 +27,6 @@ site/
 # Node and frontend artifacts
 node_modules/
 .svelte-kit/
-package-lock.json
 
 # Editor and OS files
 .DS_Store
