@@ -3,9 +3,12 @@ import { describe, expect, it } from "vitest";
 import {
   aggregateMarketPoints,
   applyMarketView,
+  buildChartHudState,
   buildCandlestickSeries,
   buildNormalizedQuoteVolumeSeries,
   buildPriceSeries,
+  formatChartHudDate,
+  formatChartHudVolume,
   filterMarketPointsByLookback,
   getVolumeScale,
   shouldDisplayVixOverlay,
@@ -61,5 +64,14 @@ describe("market helpers", () => {
     expect(filterMarketPointsByLookback(points, "1M")).toHaveLength(2);
     expect(aggregateMarketPoints(points, "1M")).toHaveLength(2);
     expect(applyMarketView(points, "ALL", "1W").length).toBeGreaterThan(0);
+  });
+
+  it("builds stable HUD state and compact formatting", () => {
+    const hudState = buildChartHudState(points[2]!, null, "latest");
+
+    expect(hudState?.close).toBe(510);
+    expect(hudState?.source).toBe("latest");
+    expect(formatChartHudDate("2026-04-05")).toBe("Apr 05");
+    expect(formatChartHudVolume(255000, getVolumeScale(points))).toBe("$255 K");
   });
 });

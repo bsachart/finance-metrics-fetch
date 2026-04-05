@@ -8,6 +8,11 @@
     AGGREGATION_PERIODS,
     LOOKBACK_PRESETS,
     applyMarketView,
+    buildChartHudState,
+    formatChartHudDate,
+    formatChartHudPrice,
+    formatChartHudVolume,
+    getVolumeScale,
     shouldDisplayVixOverlay,
     type AggregationPeriod,
     type LookbackPreset,
@@ -17,7 +22,7 @@
     pushRecentSymbol,
     sanitizeRecentSymbols,
   } from "$data/dashboard";
-  import type { DashboardSection, TickerFilterKey } from "$data/types";
+  import type { ChartHudState, DashboardSection, TickerFilterKey } from "$data/types";
   import {
     Alert,
     AlertDescription,
@@ -58,6 +63,7 @@
   let showVix = true;
   let hasLoadedPreferences = false;
   let vixToggleId = "show-vix";
+  let hoverHudState: ChartHudState | null = null;
 
   $: snapshotDate = new Date(data.dashboard.status.finished_at);
   $: dataAsOfLabel = snapshotDate.toLocaleString("en-US", {
@@ -112,6 +118,7 @@
   $: trendLabel = `Trend (${selectedLookback})`;
   $: recentSymbols = sanitizeRecentSymbols(data.dashboard, recentSymbols);
   $: hasAnyVixData = Boolean(data.dashboard.vixSymbol && vixPoints.length > 0);
+  $: volumeScale = getVolumeScale(marketPoints);
   $: showVixOverlay = shouldDisplayVixOverlay(
     selectedSymbol,
     data.dashboard.vixSymbol,
@@ -148,6 +155,12 @@
         .filter((value): value is string => Boolean(value))
         .join(" • ")
     : "";
+  $: latestHudState = buildChartHudState(
+    marketPoints.at(-1) ?? null,
+    showVixOverlay ? (vixPoints.at(-1) ?? null) : null,
+    "latest",
+  );
+  $: displayedHudState = hoverHudState ?? latestHudState;
   $: if (hasLoadedPreferences) {
     savePreferences();
   }
@@ -281,6 +294,7 @@
     recentSymbols = pushRecentSymbol(data.dashboard, recentSymbols, symbol);
     searchQuery = "";
     isFinderOpen = false;
+    hoverHudState = null;
   }
 
   function getDefaultIndexKey(): string {
@@ -291,6 +305,10 @@
       data.dashboard.indexOptions.find((option) => option.hasConstituents)?.key ??
       ""
     );
+  }
+
+  function handleHudChange(state: ChartHudState | null): void {
+    hoverHudState = state;
   }
 </script>
 
@@ -315,39 +333,6 @@
     </div>
 
     <div class="flex flex-col gap-3 sm:items-end">
-      {#if activeSection === "tickers"}
-        <button
-          class="flex w-full min-w-[18rem] items-center gap-3 rounded-full border bg-card/78 px-4 py-2 text-left shadow-[0_12px_32px_rgba(18,26,33,0.08)] transition hover:border-ring/30 hover:bg-card sm:w-auto"
-          on:click={() => {
-            isFinderOpen = true;
-          }}
-          type="button"
-        >
-          <span aria-hidden="true" class="text-muted-foreground">
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24">
-              <circle
-                cx="11"
-                cy="11"
-                r="7"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-width="1.8"
-              ></circle>
-              <path
-                d="m20 20-3.5-3.5"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-width="1.8"
-              ></path>
-            </svg>
-          </span>
-          <span class="flex-1 text-sm text-muted-foreground">Find ticker...</span>
-          <span class="rounded-md border bg-background/70 px-2 py-0.5 text-xs text-muted-foreground">
-            Cmd/Ctrl+K
-          </span>
-        </button>
-      {/if}
-
       <div class="rounded-[20px] border bg-card/80 px-4 py-3 text-sm shadow-[0_12px_32px_rgba(18,26,33,0.08)]">
         <div class="flex items-start gap-2">
           <div class="min-w-0">
@@ -406,6 +391,39 @@
 
               <div class="rounded-[22px] border bg-background/55 p-4">
                 <div class="flex flex-col gap-5">
+                  <div class="flex justify-end">
+                    <button
+                      class="flex w-full min-w-[18rem] items-center gap-3 rounded-full border bg-card/78 px-4 py-2 text-left transition hover:border-ring/30 hover:bg-card sm:w-auto"
+                      on:click={() => {
+                        isFinderOpen = true;
+                      }}
+                      type="button"
+                    >
+                      <span aria-hidden="true" class="text-muted-foreground">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24">
+                          <circle
+                            cx="11"
+                            cy="11"
+                            r="7"
+                            stroke="currentColor"
+                            stroke-linecap="round"
+                            stroke-width="1.8"
+                          ></circle>
+                          <path
+                            d="m20 20-3.5-3.5"
+                            stroke="currentColor"
+                            stroke-linecap="round"
+                            stroke-width="1.8"
+                          ></path>
+                        </svg>
+                      </span>
+                      <span class="flex-1 text-sm text-muted-foreground">Find ticker...</span>
+                      <span class="rounded-md border bg-background/70 px-2 py-0.5 text-xs text-muted-foreground">
+                        Cmd/Ctrl+K
+                      </span>
+                    </button>
+                  </div>
+
                   <div class="grid gap-4 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,0.8fr)_auto]">
                     <div>
                       <p class="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
@@ -450,9 +468,6 @@
                     </div>
 
                     <div>
-                      <p class="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                        VIX
-                      </p>
                       <label
                         class={`inline-flex min-w-[8rem] items-center justify-between gap-3 rounded-full border px-3 py-2 text-sm transition ${
                           showVixOverlay || (showVix && !hasAnyVixData)
@@ -461,7 +476,7 @@
                         } ${(!hasAnyVixData || selectedSymbol === data.dashboard.vixSymbol) ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
                         for={vixToggleId}
                       >
-                        <span>Show VIX</span>
+                        <span>VIX</span>
                         <span
                           class={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
                             showVixOverlay ? "bg-primary" : "bg-muted"
@@ -483,6 +498,20 @@
                       </label>
                     </div>
                   </div>
+
+                  {#if displayedHudState}
+                    <div class="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-[18px] border bg-card/78 px-4 py-3 font-mono text-sm">
+                      <span class="text-muted-foreground">{formatChartHudDate(displayedHudState.date)}</span>
+                      <span><span class="text-muted-foreground">O</span> {formatChartHudPrice(displayedHudState.open)}</span>
+                      <span><span class="text-muted-foreground">H</span> {formatChartHudPrice(displayedHudState.high)}</span>
+                      <span><span class="text-muted-foreground">L</span> {formatChartHudPrice(displayedHudState.low)}</span>
+                      <span><span class="text-muted-foreground">C</span> {formatChartHudPrice(displayedHudState.close)}</span>
+                      <span class="text-blue-600">Vol {formatChartHudVolume(displayedHudState.quoteVolume, volumeScale)}</span>
+                      {#if displayedHudState.vix !== null}
+                        <span class="text-amber-600">VIX {formatChartHudPrice(displayedHudState.vix)}</span>
+                      {/if}
+                    </div>
+                  {/if}
                 </div>
               </div>
             </div>
@@ -490,6 +519,7 @@
             <div class="pt-2">
               {#key selectedSymbol}
                 <PriceChart
+                  onHudChange={handleHudChange}
                   points={marketPoints}
                   showVix={showVixOverlay}
                   vixPoints={showVixOverlay ? vixPoints : []}

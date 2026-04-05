@@ -118,6 +118,17 @@ export interface HistogramBucket {
   count: number;
 }
 
+export interface ChartHudState {
+  source: "latest" | "hover";
+  date: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  quoteVolume: number;
+  vix: number | null;
+}
+
 export interface DashboardData {
   status: PublishedStatus;
   symbolOptions: SymbolOption[];

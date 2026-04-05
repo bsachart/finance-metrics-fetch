@@ -5,7 +5,7 @@ import type {
   LineData,
 } from "lightweight-charts";
 
-import type { MarketPoint } from "./types";
+import type { ChartHudState, MarketPoint } from "./types";
 
 export interface VolumeScale {
   divisor: number;
@@ -139,6 +139,45 @@ export function buildNormalizedQuoteVolumeSeries(
 export function formatVolumeAxisValue(value: number, scale: VolumeScale): string {
   const suffix = scale.suffix ? ` ${scale.suffix}` : "";
   return `${trimTrailingZeros(value)}${suffix}`;
+}
+
+export function buildChartHudState(
+  point: MarketPoint | null,
+  vixPoint: MarketPoint | null,
+  source: "latest" | "hover",
+): ChartHudState | null {
+  if (!point) {
+    return null;
+  }
+
+  return {
+    close: point.close,
+    date: point.date,
+    high: point.high,
+    low: point.low,
+    open: point.open,
+    quoteVolume: point.quote_volume,
+    source,
+    vix: vixPoint?.close ?? null,
+  };
+}
+
+export function formatChartHudDate(value: string): string {
+  return parseUtcDate(value).toLocaleDateString("en-US", {
+    day: "2-digit",
+    month: "short",
+  });
+}
+
+export function formatChartHudPrice(value: number): string {
+  return value.toLocaleString("en-US", {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2,
+  });
+}
+
+export function formatChartHudVolume(value: number, scale: VolumeScale): string {
+  return `$${formatVolumeAxisValue(value / scale.divisor, scale)}`;
 }
 
 export function shouldDisplayVixOverlay(

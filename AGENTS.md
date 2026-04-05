@@ -1,6 +1,6 @@
 # finance_metrics_fetch Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2026-04-05
+Auto-generated from all feature plans. Last updated: 2026-04-06
 
 ## Active Technologies
 - TypeScript 5.x, SvelteKit on Node.js 20+ + SvelteKit, `@sveltejs/adapter-static`, `shadcn-svelte`, Lightweight Charts, Papa Parse, Vitest (002-market-ui)
@@ -14,6 +14,7 @@ Auto-generated from all feature plans. Last updated: 2026-04-05
 - TypeScript 5.x and Svelte 5 + SvelteKit, Lightweight Charts, existing shadcn-svelte primitives, existing dashboard data loaders (005-scale-ticker-selection)
 - Versioned repository files under `data/` and `config/tickers.json`, plus browser local storage for UI preferences (005-scale-ticker-selection)
 - TypeScript 5.x and Svelte 5 + SvelteKit, Lightweight Charts, existing dashboard data loaders, existing shadcn-svelte primitives (006-unify-analytics-workspace)
+- TypeScript 6.x and Svelte 5 + SvelteKit, Lightweight Charts, existing dashboard data loaders, existing shadcn-svelte primitives (008-hud-dashboard)
 
 ## Project Structure
 
@@ -43,9 +44,9 @@ ui/
 Python 3.12 with type hints: Follow standard conventions and keep dataframe work in Polars, not pandas.
 
 ## Recent Changes
+- 008-hud-dashboard: Added TypeScript 6.x and Svelte 5 + SvelteKit, Lightweight Charts, existing dashboard data loaders, existing shadcn-svelte primitives
 - 007-command-center-finder: Added TypeScript 5.x and Svelte 5 + SvelteKit, Lightweight Charts, existing dashboard data loaders, existing shadcn-svelte primitives
 - 006-unify-analytics-workspace: Added TypeScript 5.x and Svelte 5 + SvelteKit, Lightweight Charts, existing dashboard data loaders, existing shadcn-svelte primitives
-- 005-scale-ticker-selection: Added TypeScript 5.x and Svelte 5 + SvelteKit, Lightweight Charts, existing shadcn-svelte primitives, existing dashboard data loaders
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->
