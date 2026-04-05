@@ -1,20 +1,15 @@
 # Finance Metrics Fetch
 
-Finance Metrics Fetch is a small market-data project for extracting OHLCV data
-from Yahoo Finance and ticker lists from Wikipedia, then storing normalized
-datasets for a configured set of tickers. It includes a Python refresh pipeline
-and a static UI in `ui/` that packages the repository's published `data/`
-artifacts for GitHub Pages.
+Finance Metrics Fetch refreshes repository-backed market datasets and publishes
+a static dashboard for browsing ticker history and market constituents.
 
-## Initial Scope
+Live dashboard: https://bsachart.github.io/finance-metrics-fetch/
 
-- Extract OHLCV history from Yahoo Finance for configured tickers such as
-  `VOO` and `^VIX`
-- Derive and store dollar volume (`close * volume`) alongside OHLCV data
-- Extract S&P 500 and Nasdaq-100 ticker lists from Wikipedia
-- Persist fetched datasets to repository-friendly files such as CSV and JSON
-- Run scheduled and manual fetch workflows from GitHub Actions
-- Publish normalized outputs that the static UI can consume
+The repository includes:
+
+- a Python refresh pipeline for OHLCV and constituent data
+- published CSV and JSON artifacts under `data/`
+- a static Svelte UI in `ui/` for GitHub Pages
 
 ## Documentation
 
@@ -23,9 +18,9 @@ artifacts for GitHub Pages.
 - [.specify/memory/constitution.md](/home/bog/Documents/finance_metrics_fetch/.specify/memory/constitution.md):
   repository governance principles for spec-kit
 
-## Current Data Workflow
+## Data Workflow
 
-Sync the Python environment:
+Set up the Python environment:
 
 ```bash
 uv sync
@@ -37,7 +32,7 @@ Refresh the configured market and constituent datasets:
 uv run python -m finance_metrics_fetch.cli refresh --config config/tickers.json
 ```
 
-Current refresh outputs:
+Refresh outputs:
 
 - `data/market/<SYMBOL>.csv` for normalized OHLCV plus dollar-volume data
 - `data/constituents/sp500.csv` for S&P 500 constituents
@@ -45,24 +40,11 @@ Current refresh outputs:
 - `data/constituents/history/<INDEX>/<YYYY-MM-DD>.csv` for dated constituent snapshots
 - `data/status/latest.json` for the latest refresh summary
 
-Constituent CSV schema:
-
-- `index_name`
-- `symbol`
-- `name`
-- `sector`
-- `sub_industry`
-- `source_url`
-
-## UI Workflow
+## UI
 
 The repository includes a static UI in [ui/](/home/bog/Documents/finance_metrics_fetch/ui)
 that reads packaged copies of the committed `data/` files and
 `config/tickers.json`.
-
-Live dashboard:
-
-- https://bsachart.github.io/finance-metrics-fetch/
 
 Install and verify the UI:
 
@@ -78,15 +60,15 @@ The dashboard provides:
 
 - symbol and index discovery from packaged published assets
 - a compact ticker-first layout with the main chart at the top of the ticker workflow
-- one combined OHLC and dollar-volume chart with compact volume units
-- VIX shown on the market chart by default with a simple hide toggle
+- a price, VIX, and dollar-volume chart with compact volume units
+- VIX shown by default with a simple hide toggle
 - local browser persistence for selected symbol, tab, lookback, bar period, index, and VIX toggle
 - lookback presets such as `1W`, `1M`, `YTD`, `1Y`, and `5Y`
 - bar aggregation controls for `1D`, `1W`, and `1M`, defaulting to `1M` lookback and daily bars
 - separate `Tickers` and `Market Constituents` views
 - dated constituent history files in the repository instead of per-row fetch timestamps
 
-## GitHub Actions Schedule
+## Automation
 
 The repository now includes
 [`refresh-data.yml`](/home/bog/Documents/finance_metrics_fetch/.github/workflows/refresh-data.yml)
@@ -97,8 +79,6 @@ to refresh market and constituent data on GitHub Actions.
 - daily alternative: already commented in the workflow file if you want to
   switch from every 2 hours to once per day
 - uses current GitHub Actions majors compatible with the Node 24 migration
-
-## GitHub Pages
 
 The repository also includes
 [`deploy-ui.yml`](/home/bog/Documents/finance_metrics_fetch/.github/workflows/deploy-ui.yml)
