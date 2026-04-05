@@ -19,7 +19,6 @@
     AlertDescription,
     AlertTitle,
   } from "$lib/components/ui/alert";
-  import { Badge } from "$lib/components/ui/badge";
   import { Card } from "$lib/components/ui/card";
   import { Tabs, TabsContent, TabsList, TabsTrigger } from "$lib/components/ui/tabs";
   import { onMount } from "svelte";
@@ -29,6 +28,16 @@
   export let data: PageData;
 
   const refreshIntervalMs = 60_000;
+  const storageKey = "finance-metrics-fetch-ui";
+
+  type DashboardPreferences = {
+    activeSection?: DashboardSection;
+    selectedAggregation?: AggregationPeriod;
+    selectedIndex?: string;
+    selectedLookback?: LookbackPreset;
+    selectedSymbol?: string | null;
+    showVix?: boolean;
+  };
 
   let selectedSymbol = data.defaultSymbol;
   let activeSection: DashboardSection = "tickers";
@@ -36,6 +45,7 @@
   let selectedLookback: LookbackPreset = "1M";
   let selectedAggregation: AggregationPeriod = "1D";
   let showVix = true;
+  let hasLoadedPreferences = false;
 
   $: rawMarketPoints = selectedSymbol ? data.dashboard.marketBySymbol[selectedSymbol] ?? [] : [];
   $: marketPoints = applyMarketView(rawMarketPoints, selectedLookback, selectedAggregation);
@@ -70,8 +80,14 @@
     selectedIndex =
       data.dashboard.indexOptions.find((option) => option.hasConstituents)?.key ?? "";
   }
+  $: if (hasLoadedPreferences) {
+    savePreferences();
+  }
 
   onMount(() => {
+    restorePreferences();
+    hasLoadedPreferences = true;
+
     const intervalId = window.setInterval(() => {
       void invalidateAll();
     }, refreshIntervalMs);
@@ -89,6 +105,59 @@
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   });
+
+  function restorePreferences(): void {
+    const rawValue = window.localStorage.getItem(storageKey);
+    if (!rawValue) {
+      return;
+    }
+
+    try {
+      const preferences = JSON.parse(rawValue) as DashboardPreferences;
+
+      if (preferences.activeSection === "tickers" || preferences.activeSection === "constituents") {
+        activeSection = preferences.activeSection;
+      }
+
+      if (preferences.selectedLookback && LOOKBACK_PRESETS.includes(preferences.selectedLookback)) {
+        selectedLookback = preferences.selectedLookback;
+      }
+
+      if (
+        preferences.selectedAggregation &&
+        AGGREGATION_PERIODS.includes(preferences.selectedAggregation)
+      ) {
+        selectedAggregation = preferences.selectedAggregation;
+      }
+
+      if (typeof preferences.showVix === "boolean") {
+        showVix = preferences.showVix;
+      }
+
+      if (preferences.selectedSymbol && availableSymbols.has(preferences.selectedSymbol)) {
+        selectedSymbol = preferences.selectedSymbol;
+      }
+
+      if (preferences.selectedIndex && availableIndices.has(preferences.selectedIndex)) {
+        selectedIndex = preferences.selectedIndex;
+      }
+    } catch {
+      window.localStorage.removeItem(storageKey);
+    }
+  }
+
+  function savePreferences(): void {
+    const preferences: DashboardPreferences = {
+      activeSection,
+      selectedAggregation,
+      selectedIndex,
+      selectedLookback,
+      selectedSymbol,
+      showVix,
+    };
+
+    window.localStorage.setItem(storageKey, JSON.stringify(preferences));
+  }
 </script>
 
 <svelte:head>
@@ -110,13 +179,10 @@
         Repository-backed ticker analysis and market constituent browsing.
       </p>
     </div>
-    <Badge variant="outline">Static UI</Badge>
   </header>
 
   <section class="grid gap-4">
     {#if selectedSymbol}
-      <StatusCard status={data.dashboard.status} />
-
       <Tabs bind:value={activeSection} class="gap-4">
         <TabsList class="rounded-full p-1" variant="default">
           <TabsTrigger class="rounded-full px-4 text-sm" value="tickers">Tickers</TabsTrigger>
@@ -137,9 +203,6 @@
                   optional VIX context.
                 </p>
               </div>
-              <p class="text-sm text-muted-foreground">
-                Default view: one month of daily bars.
-              </p>
             </div>
 
             <div class="space-y-3">
@@ -246,6 +309,8 @@
               </AlertDescription>
             </Alert>
           {/if}
+
+          <StatusCard status={data.dashboard.status} />
         </TabsContent>
 
         <TabsContent class="mt-0 grid gap-4" value="constituents">

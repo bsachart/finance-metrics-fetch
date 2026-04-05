@@ -60,6 +60,10 @@ The repository includes a static UI in [ui/](/home/bog/Documents/finance_metrics
 that reads packaged copies of the committed `data/` files and
 `config/tickers.json`.
 
+Live dashboard:
+
+- https://bsachart.github.io/finance-metrics-fetch/
+
 Install and verify the UI:
 
 ```bash
@@ -76,6 +80,7 @@ The dashboard provides:
 - a compact ticker-first layout with the main chart at the top of the ticker workflow
 - one combined OHLC and dollar-volume chart with compact volume units
 - VIX shown on the market chart by default with a simple hide toggle
+- local browser persistence for selected symbol, tab, lookback, bar period, index, and VIX toggle
 - lookback presets such as `1W`, `1M`, `YTD`, `1Y`, and `5Y`
 - bar aggregation controls for `1D`, `1W`, and `1M`, defaulting to `1M` lookback and daily bars
 - separate `Tickers` and `Market Constituents` views

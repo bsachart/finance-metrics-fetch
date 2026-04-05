@@ -38,7 +38,13 @@
     chart = createChart(host, {
       autoSize: true,
       crosshair: {
+        horzLine: {
+          labelBackgroundColor: "#2563eb",
+        },
         mode: 3,
+        vertLine: {
+          labelBackgroundColor: "#13212f",
+        },
       },
       layout: {
         attributionLogo: false,
