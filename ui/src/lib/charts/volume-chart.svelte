@@ -59,8 +59,8 @@
 
   onMount(setupChart);
 
-  $: points;
   $: if (chart && volumeSeries) {
+    points;
     syncSeries();
   }
 

@@ -70,8 +70,9 @@
     setupChart();
   });
 
-  $: points, overlayPoints;
   $: if (chart && priceSeries && vixSeries) {
+    points;
+    overlayPoints;
     syncSeries();
   }
 
