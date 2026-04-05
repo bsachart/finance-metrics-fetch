@@ -24,6 +24,8 @@ describe("dashboard data orchestration", () => {
         "index_name,symbol,name,sector,sub_industry,source_url\nsp500,VOO,Vanguard S&P 500 ETF,Financials,ETF,https://example.com",
       "/published/data/market/%5EVIX.csv":
         "date,symbol,open,high,low,close,volume,quote_volume\n2026-04-04,^VIX,20,21,19,20.5,10,205",
+      "/published/data/market/MSFT.csv":
+        "date,symbol,open,high,low,close,volume,quote_volume\n2026-04-04,MSFT,400,405,398,403,100,40300",
       "/published/data/market/VOO.csv":
         "date,symbol,open,high,low,close,volume,quote_volume\n2026-04-04,VOO,500,505,498,503,100,50300",
       "/published/asset-manifest.json": JSON.stringify({
@@ -33,6 +35,7 @@ describe("dashboard data orchestration", () => {
         ],
         symbols: [
           { enabled: true, has_market_data: true, label: "CBOE Volatility Index", role: "volatility", symbol: "^VIX" },
+          { enabled: true, has_market_data: true, label: "Microsoft", role: "asset", symbol: "MSFT" },
           { enabled: true, has_market_data: true, label: "Vanguard S&P 500 ETF", role: "benchmark", symbol: "VOO" },
         ],
       }),
@@ -52,6 +55,7 @@ describe("dashboard data orchestration", () => {
         ],
         tickers: [
           { enabled: true, label: "CBOE Volatility Index", role: "volatility", source: "x", symbol: "^VIX" },
+          { enabled: true, label: "Microsoft", role: "asset", source: "x", symbol: "MSFT" },
           { enabled: true, label: "Vanguard S&P 500 ETF", role: "benchmark", source: "x", symbol: "VOO" },
         ],
       }),
@@ -61,6 +65,11 @@ describe("dashboard data orchestration", () => {
 
     expect(payload.dashboard.vixSymbol).toBe("^VIX");
     expect(getDefaultSymbol(payload.dashboard)).toBe("VOO");
+    expect(payload.dashboard.symbolOptions.map((option) => option.symbol)).toEqual([
+      "VOO",
+      "MSFT",
+      "^VIX",
+    ]);
     expect(payload.dashboard.constituentsByIndex.sp500).toHaveLength(1);
     expect(payload.dashboard.indexOptions).toHaveLength(2);
   });

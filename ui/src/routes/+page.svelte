@@ -227,7 +227,6 @@
               <PriceChart
                 points={marketPoints}
                 showVix={showVixOverlay}
-                vixLabel={data.dashboard.vixSymbol ?? "VIX"}
                 vixPoints={showVixOverlay ? vixPoints : []}
               />
             {/key}

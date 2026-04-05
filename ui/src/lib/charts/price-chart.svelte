@@ -20,7 +20,6 @@
 
   export let points: MarketPoint[] = [];
   export let showVix = false;
-  export let vixLabel = "VIX";
   export let vixPoints: MarketPoint[] = [];
 
   let host: HTMLDivElement;
@@ -96,7 +95,7 @@
         lineWidth: 2,
         priceLineVisible: false,
         priceScaleId: "left",
-        title: vixLabel,
+        title: "",
       },
       0,
     );
@@ -127,7 +126,7 @@
     volumeSeries.setData(buildNormalizedQuoteVolumeSeries(points, volumeScale));
     vixSeries.applyOptions({
       lastValueVisible: hasVix,
-      title: vixLabel,
+      title: "",
       visible: hasVix,
     });
     vixSeries.setData(hasVix ? buildPriceSeries(vixPoints) : []);
