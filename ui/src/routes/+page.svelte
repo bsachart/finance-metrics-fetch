@@ -2,7 +2,6 @@
   import { invalidateAll } from "$app/navigation";
   import PriceChart from "$charts/price-chart.svelte";
   import VolumeChart from "$charts/volume-chart.svelte";
-  import Card from "$components/ui/card.svelte";
   import ConstituentTable from "$components/constituent-table.svelte";
   import DistributionPanel from "$components/distribution-panel.svelte";
   import EmptyState from "$components/empty-state.svelte";
@@ -11,6 +10,9 @@
   import SymbolSelector from "$components/symbol-selector.svelte";
   import VixContext from "$components/vix-context.svelte";
   import { buildSummaryMetrics } from "$data/market";
+  import { Badge } from "$lib/components/ui/badge";
+  import { Button } from "$lib/components/ui/button";
+  import { Card } from "$lib/components/ui/card";
   import { onMount } from "svelte";
 
   import type { PageData } from "./$types";
@@ -62,23 +64,26 @@
   />
 </svelte:head>
 
-<div class="page-shell">
-  <header>
-    <h1 class="hero-title">Market history from the repository, not a live backend.</h1>
-    <p class="hero-copy">
+<div class="mx-auto w-[min(1200px,calc(100vw-2rem))] pb-12 pt-5 md:pt-8">
+  <header class="space-y-6">
+    <Badge variant="outline">Published market dashboard</Badge>
+    <h1 class="max-w-6xl text-6xl font-semibold leading-none tracking-[-0.05em] md:text-8xl">
+      Market history from the repository, not a live backend.
+    </h1>
+    <p class="max-w-3xl text-lg leading-8 text-muted-foreground">
       This dashboard reads the published repository data, refreshes it automatically, and
       lets you inspect price, quote volume, volatility context, and index constituents from
       the same place.
     </p>
   </header>
 
-  <section class="grid" style="margin-top: 1.5rem">
+  <section class="mt-6 grid gap-4">
     <StatusCard status={data.dashboard.status} />
 
     {#if data.warnings.length > 0}
-      <Card>
-        <h2 class="section-title">Data warnings</h2>
-        <ul class="warning-list">
+      <Card className="space-y-3">
+        <h2 class="text-2xl font-semibold tracking-tight">Data warnings</h2>
+        <ul class="list-disc space-y-1 pl-5 text-muted-foreground">
           {#each data.warnings as warning}
             <li>{warning}</li>
           {/each}
@@ -87,11 +92,11 @@
     {/if}
 
     {#if selectedSymbol}
-      <Card>
-        <div class="panel-header">
+      <Card className="space-y-4">
+        <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
           <div>
-            <h2 class="section-title">Published symbols</h2>
-            <p class="section-copy">
+            <h2 class="text-3xl font-semibold tracking-tight">Published symbols</h2>
+            <p class="mt-2 text-muted-foreground">
               Symbol switches are local UI updates because the dashboard loads the packaged
               repository datasets up front.
             </p>
@@ -103,21 +108,35 @@
         />
       </Card>
 
-      <div class="panel-switcher">
-        <button class:active={activePanel === "market"} on:click={() => (activePanel = "market")} type="button">Market view</button>
-        <button class:active={activePanel === "distribution"} on:click={() => (activePanel = "distribution")} type="button">Distributions</button>
-        <button class:active={activePanel === "constituents"} on:click={() => (activePanel = "constituents")} type="button">Constituents</button>
+      <div class="flex flex-wrap gap-3">
+        <Button
+          on:click={() => (activePanel = "market")}
+          type="button"
+          variant={activePanel === "market" ? "default" : "outline"}>Market view</Button
+        >
+        <Button
+          on:click={() => (activePanel = "distribution")}
+          type="button"
+          variant={activePanel === "distribution" ? "default" : "outline"}>Distributions</Button
+        >
+        <Button
+          on:click={() => (activePanel = "constituents")}
+          type="button"
+          variant={activePanel === "constituents" ? "default" : "outline"}>Constituents</Button
+        >
       </div>
 
       {#if activePanel === "market"}
-        <section class="grid">
+        <section class="grid gap-4">
           <MarketSummary metrics={summaryMetrics} />
           <VixContext points={vixPoints} symbol={data.dashboard.vixSymbol} />
-          <Card>
-            <div class="panel-header">
+          <Card className="space-y-4">
+            <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
               <div>
-                <h2 class="section-title">{selectedSymbol} price with VIX context</h2>
-                <p class="section-copy">
+                <h2 class="text-3xl font-semibold tracking-tight">
+                  {selectedSymbol} price with VIX context
+                </h2>
+                <p class="mt-2 text-muted-foreground">
                   Closing history for the selected symbol, overlaid with the published
                   volatility context when available.
                 </p>
@@ -125,11 +144,11 @@
             </div>
             <PriceChart overlayPoints={vixPoints} points={marketPoints} />
           </Card>
-          <Card>
-            <div class="panel-header">
+          <Card className="space-y-4">
+            <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
               <div>
-                <h2 class="section-title">Nominal quote volume</h2>
-                <p class="section-copy">
+                <h2 class="text-3xl font-semibold tracking-tight">Nominal quote volume</h2>
+                <p class="mt-2 text-muted-foreground">
                   Repository-published `quote_volume` derived from close multiplied by share
                   volume.
                 </p>
@@ -141,10 +160,18 @@
       {:else if activePanel === "distribution"}
         <DistributionPanel points={marketPoints} />
       {:else}
-        <section class="grid">
-          <div class="panel-switcher constituent-switcher">
-            <button class:active={selectedIndex === "sp500"} on:click={() => (selectedIndex = "sp500")} type="button">S&amp;P 500</button>
-            <button class:active={selectedIndex === "nasdaq100"} on:click={() => (selectedIndex = "nasdaq100")} type="button">Nasdaq-100</button>
+        <section class="grid gap-4">
+          <div class="flex flex-wrap gap-3">
+            <Button
+              on:click={() => (selectedIndex = "sp500")}
+              type="button"
+              variant={selectedIndex === "sp500" ? "default" : "outline"}>S&amp;P 500</Button
+            >
+            <Button
+              on:click={() => (selectedIndex = "nasdaq100")}
+              type="button"
+              variant={selectedIndex === "nasdaq100" ? "default" : "outline"}>Nasdaq-100</Button
+            >
           </div>
           <ConstituentTable
             indexLabel={selectedIndex === "sp500" ? "S&P 500" : "Nasdaq-100"}
@@ -160,34 +187,3 @@
     {/if}
   </section>
 </div>
-
-<style>
-  .warning-list {
-    color: var(--color-muted-ink);
-    margin: 0;
-    padding-left: 1rem;
-  }
-
-  .panel-switcher {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.7rem;
-  }
-
-  .panel-switcher button {
-    border: 1px solid var(--color-border);
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.72);
-    cursor: pointer;
-    padding: 0.8rem 1rem;
-  }
-
-  .panel-switcher button.active {
-    background: var(--color-ink);
-    color: white;
-  }
-
-  .constituent-switcher {
-    margin-bottom: 0.4rem;
-  }
-</style>

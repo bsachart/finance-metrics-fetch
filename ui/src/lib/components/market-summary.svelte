@@ -6,16 +6,8 @@
   export let metrics: SummaryMetric[];
 </script>
 
-<div class="summary-grid">
+<div class="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
   {#each metrics as metric}
     <ValueChip {...metric} />
   {/each}
 </div>
-
-<style>
-  .summary-grid {
-    display: grid;
-    gap: 0.8rem;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-  }
-</style>

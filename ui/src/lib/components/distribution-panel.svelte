@@ -6,18 +6,10 @@
   export let points: MarketPoint[] = [];
 </script>
 
-<div class="distribution-grid">
+<div class="grid gap-4 xl:grid-cols-2">
   <HistogramChart buckets={buildPriceHistogram(points)} label="Price histogram" />
   <HistogramChart
     buckets={buildQuoteVolumeHistogram(points)}
     label="Quote volume histogram"
   />
 </div>
-
-<style>
-  .distribution-grid {
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  }
-</style>

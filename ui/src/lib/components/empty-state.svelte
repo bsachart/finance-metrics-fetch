@@ -1,11 +1,11 @@
 <script lang="ts">
-  import Card from "$components/ui/card.svelte";
+  import { Card } from "$lib/components/ui/card";
 
   export let title: string;
   export let message: string;
 </script>
 
-<Card>
-  <h2 class="section-title">{title}</h2>
-  <p class="section-copy">{message}</p>
+<Card className="space-y-3">
+  <h2 class="text-2xl font-semibold tracking-tight">{title}</h2>
+  <p class="max-w-2xl text-muted-foreground">{message}</p>
 </Card>
