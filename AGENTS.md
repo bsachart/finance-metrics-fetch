@@ -43,9 +43,9 @@ ui/
 Python 3.12 with type hints: Follow standard conventions and keep dataframe work in Polars, not pandas.
 
 ## Recent Changes
+- 007-command-center-finder: Added TypeScript 5.x and Svelte 5 + SvelteKit, Lightweight Charts, existing dashboard data loaders, existing shadcn-svelte primitives
 - 006-unify-analytics-workspace: Added TypeScript 5.x and Svelte 5 + SvelteKit, Lightweight Charts, existing dashboard data loaders, existing shadcn-svelte primitives
 - 005-scale-ticker-selection: Added TypeScript 5.x and Svelte 5 + SvelteKit, Lightweight Charts, existing shadcn-svelte primitives, existing dashboard data loaders
-- 004-simplify-chart-layout: Added TypeScript 5.x and Svelte 5 for the static UI, YAML for GitHub Actions workflow updates + SvelteKit, `@sveltejs/adapter-static`, Lightweight Charts, shadcn-svelte tabs/card primitives
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

@@ -3,11 +3,7 @@
   import PriceChart from "$charts/price-chart.svelte";
   import ConstituentTable from "$components/constituent-table.svelte";
   import EmptyState from "$components/empty-state.svelte";
-  import RecentTickers from "$components/recent-tickers.svelte";
-  import StatusCard from "$components/status-card.svelte";
-  import TickerFilters from "$components/ticker-filters.svelte";
-  import TickerList from "$components/ticker-list.svelte";
-  import TickerSearch from "$components/ticker-search.svelte";
+  import SearchModal from "$components/search-modal.svelte";
   import {
     AGGREGATION_PERIODS,
     LOOKBACK_PRESETS,
@@ -53,6 +49,7 @@
   let selectedSymbol = data.defaultSymbol;
   let activeSection: DashboardSection = "tickers";
   let activeFilter: TickerFilterKey = "all";
+  let isFinderOpen = false;
   let recentSymbols: string[] = [];
   let searchQuery = "";
   let selectedIndex = getDefaultIndexKey();
@@ -63,11 +60,13 @@
   let vixToggleId = "show-vix";
 
   $: snapshotDate = new Date(data.dashboard.status.finished_at);
-  $: snapshotDayLabel = snapshotDate.toLocaleDateString("en-US", {
-    weekday: "long",
+  $: dataAsOfLabel = snapshotDate.toLocaleString("en-US", {
+    weekday: activeSection === "constituents" ? "short" : undefined,
     year: "numeric",
-    month: "long",
+    month: "short",
     day: "numeric",
+    hour: activeSection === "tickers" ? "numeric" : undefined,
+    minute: activeSection === "tickers" ? "2-digit" : undefined,
   });
   $: rawMarketPoints = selectedSymbol ? data.dashboard.marketBySymbol[selectedSymbol] ?? [] : [];
   $: marketPoints = applyMarketView(rawMarketPoints, selectedLookback, selectedAggregation);
@@ -87,6 +86,20 @@
   );
   $: selectedSymbolOption =
     data.dashboard.symbolOptions.find((option) => option.symbol === selectedSymbol) ?? null;
+  $: selectedLatestPoint = rawMarketPoints.at(-1) ?? null;
+  $: selectedLatestPrice = selectedLatestPoint
+    ? selectedLatestPoint.close.toLocaleString("en-US", {
+        maximumFractionDigits: 2,
+        minimumFractionDigits: selectedLatestPoint.close >= 100 ? 2 : 0,
+      })
+    : "--";
+  $: selectedLatestDate = selectedLatestPoint
+    ? new Date(`${selectedLatestPoint.date}T00:00:00Z`).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : null;
   $: tickerDiscovery = buildTickerDiscoveryState(
     data.dashboard,
     searchQuery,
@@ -119,7 +132,22 @@
   $: hasStatusIssues =
     data.dashboard.status.status !== "success" ||
     data.dashboard.status.failed_symbols.length > 0 ||
-    data.dashboard.status.messages.length > 0;
+    data.dashboard.status.failed_sources.length > 0;
+  $: statusIssueLabel = hasStatusIssues
+    ? [
+        data.dashboard.status.failed_symbols.length > 0
+          ? `Failed symbols: ${data.dashboard.status.failed_symbols.join(", ")}`
+          : null,
+        data.dashboard.status.failed_sources.length > 0
+          ? `Failed sources: ${data.dashboard.status.failed_sources.join(", ")}`
+          : null,
+        data.dashboard.status.status !== "success"
+          ? `Refresh status: ${data.dashboard.status.status}`
+          : null,
+      ]
+        .filter((value): value is string => Boolean(value))
+        .join(" • ")
+    : "";
   $: if (hasLoadedPreferences) {
     savePreferences();
   }
@@ -142,11 +170,35 @@
       }
     };
 
+    const handleKeydown = (event: KeyboardEvent): void => {
+      const target = event.target;
+      const isEditableTarget =
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target instanceof HTMLSelectElement ||
+        (target instanceof HTMLElement && target.isContentEditable);
+
+      if (isEditableTarget) {
+        return;
+      }
+
+      if (
+        activeSection === "tickers" &&
+        (event.metaKey || event.ctrlKey) &&
+        event.key.toLowerCase() === "k"
+      ) {
+        event.preventDefault();
+        isFinderOpen = true;
+      }
+    };
+
     document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("keydown", handleKeydown);
 
     return () => {
       window.clearInterval(intervalId);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("keydown", handleKeydown);
     };
   });
 
@@ -228,6 +280,7 @@
     selectedSymbol = symbol;
     recentSymbols = pushRecentSymbol(data.dashboard, recentSymbols, symbol);
     searchQuery = "";
+    isFinderOpen = false;
   }
 
   function getDefaultIndexKey(): string {
@@ -261,25 +314,60 @@
       </p>
     </div>
 
-    {#if activeSection === "tickers"}
+    <div class="flex flex-col gap-3 sm:items-end">
+      {#if activeSection === "tickers"}
+        <button
+          class="flex w-full min-w-[18rem] items-center gap-3 rounded-full border bg-card/78 px-4 py-2 text-left shadow-[0_12px_32px_rgba(18,26,33,0.08)] transition hover:border-ring/30 hover:bg-card sm:w-auto"
+          on:click={() => {
+            isFinderOpen = true;
+          }}
+          type="button"
+        >
+          <span aria-hidden="true" class="text-muted-foreground">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24">
+              <circle
+                cx="11"
+                cy="11"
+                r="7"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-width="1.8"
+              ></circle>
+              <path
+                d="m20 20-3.5-3.5"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-width="1.8"
+              ></path>
+            </svg>
+          </span>
+          <span class="flex-1 text-sm text-muted-foreground">Find ticker...</span>
+          <span class="rounded-md border bg-background/70 px-2 py-0.5 text-xs text-muted-foreground">
+            Cmd/Ctrl+K
+          </span>
+        </button>
+      {/if}
+
       <div class="rounded-[20px] border bg-card/80 px-4 py-3 text-sm shadow-[0_12px_32px_rgba(18,26,33,0.08)]">
-        <p class="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          Data last updated
-        </p>
-        <p class="mt-1 font-medium">
-          {snapshotDate.toLocaleString()}
-        </p>
+        <div class="flex items-start gap-2">
+          <div class="min-w-0">
+            <p class="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              Data as of
+            </p>
+            <p class="mt-1 font-medium">
+              {dataAsOfLabel}
+            </p>
+          </div>
+          {#if hasStatusIssues}
+            <span
+              aria-label={statusIssueLabel}
+              class="mt-0.5 inline-flex h-2.5 w-2.5 rounded-full bg-amber-500"
+              title={statusIssueLabel}
+            ></span>
+          {/if}
+        </div>
       </div>
-    {:else}
-      <div class="rounded-[20px] border bg-card/80 px-4 py-3 text-sm shadow-[0_12px_32px_rgba(18,26,33,0.08)]">
-        <p class="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          Snapshot day
-        </p>
-        <p class="mt-1 font-medium">
-          {snapshotDayLabel}
-        </p>
-      </div>
-    {/if}
+    </div>
   </header>
 
   <section class="grid gap-4">
@@ -294,39 +382,27 @@
 
         <TabsContent class="mt-0 grid gap-4" value="tickers">
           <Card class="space-y-4 rounded-[28px] border bg-card/90 p-6 shadow-[0_18px_50px_rgba(18,26,33,0.12)]">
-            <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+            <div class="space-y-3">
               <div>
-                <h2 class="font-heading text-xl font-semibold tracking-tight md:text-2xl">
-                  {selectedSymbol} market history
-                </h2>
+                <p class="text-sm font-medium text-muted-foreground">
+                  {selectedSymbolOption?.label ?? "Published symbol"}
+                </p>
+                <div class="mt-1 flex flex-wrap items-end gap-3">
+                  <h2 class="font-heading text-3xl font-semibold tracking-tight md:text-4xl">
+                    {selectedSymbol}
+                  </h2>
+                  <p class="text-2xl font-semibold tracking-tight text-foreground/90 md:text-3xl">
+                    ${selectedLatestPrice}
+                  </p>
+                </div>
                 <p class="mt-2 text-sm text-muted-foreground">
-                  {selectedSymbolOption?.label ?? "Published symbol"} with price, volume, and
-                  optional volatility context.
+                  {#if selectedLatestDate}
+                    Latest published close from {selectedLatestDate}.
+                  {:else}
+                    Latest published close is unavailable in this snapshot.
+                  {/if}
                 </p>
               </div>
-            </div>
-
-            <div class="space-y-5">
-              <TickerSearch
-                bind:query={searchQuery}
-                entries={tickerDiscovery.entries}
-                {selectedSymbol}
-                onSelect={selectSymbol}
-              />
-
-              <RecentTickers
-                entries={tickerDiscovery.recentEntries}
-                {selectedSymbol}
-                onSelect={selectSymbol}
-              />
-
-              <TickerFilters
-                activeFilter={tickerDiscovery.activeFilter}
-                options={tickerDiscovery.filterOptions}
-                onSelect={(key) => {
-                  activeFilter = key;
-                }}
-              />
 
               <div class="rounded-[22px] border bg-background/55 p-4">
                 <div class="flex flex-col gap-5">
@@ -407,54 +483,36 @@
                       </label>
                     </div>
                   </div>
-
                 </div>
               </div>
             </div>
 
-            {#key selectedSymbol}
-              <PriceChart
-                points={marketPoints}
-                showVix={showVixOverlay}
-                vixPoints={showVixOverlay ? vixPoints : []}
-              />
-            {/key}
-          </Card>
-
-          <Card class="space-y-4 rounded-[28px] border bg-card/90 p-6 shadow-[0_18px_50px_rgba(18,26,33,0.12)]">
-            <div>
-              <h3 class="font-heading text-lg font-semibold tracking-tight">Published tickers</h3>
-              <p class="mt-1 text-sm text-muted-foreground">
-                Search and scan the current published ticker universe in a compact list.
-              </p>
+            <div class="pt-2">
+              {#key selectedSymbol}
+                <PriceChart
+                  points={marketPoints}
+                  showVix={showVixOverlay}
+                  vixPoints={showVixOverlay ? vixPoints : []}
+                />
+              {/key}
             </div>
 
-            <TickerList
-              entries={tickerDiscovery.entries}
-              {selectedSymbol}
-              {trendLabel}
-              onSelect={selectSymbol}
-            />
+            {#if data.warnings.length > 0}
+              <Alert class="rounded-[28px] border bg-card/90 p-6 shadow-[0_18px_50px_rgba(18,26,33,0.12)]">
+                <AlertTitle class="font-heading text-xl font-semibold tracking-tight">
+                  Data warnings
+                </AlertTitle>
+                <AlertDescription>
+                  <ul class="mt-3 list-disc space-y-1 pl-5 text-muted-foreground">
+                    {#each data.warnings as warning}
+                      <li>{warning}</li>
+                    {/each}
+                  </ul>
+                </AlertDescription>
+              </Alert>
+            {/if}
+
           </Card>
-
-          {#if data.warnings.length > 0}
-            <Alert class="rounded-[28px] border bg-card/90 p-6 shadow-[0_18px_50px_rgba(18,26,33,0.12)]">
-              <AlertTitle class="font-heading text-xl font-semibold tracking-tight">
-                Data warnings
-              </AlertTitle>
-              <AlertDescription>
-                <ul class="mt-3 list-disc space-y-1 pl-5 text-muted-foreground">
-                  {#each data.warnings as warning}
-                    <li>{warning}</li>
-                  {/each}
-                </ul>
-              </AlertDescription>
-            </Alert>
-          {/if}
-
-          {#if hasStatusIssues}
-            <StatusCard status={data.dashboard.status} />
-          {/if}
         </TabsContent>
 
         <TabsContent class="mt-0 grid gap-4" value="constituents">
@@ -466,9 +524,6 @@
                 </h2>
                 <p class="mt-2 text-sm text-muted-foreground">
                   Browse the latest published index memberships separately from ticker analysis.
-                </p>
-                <p class="mt-1 text-sm text-muted-foreground">
-                  Snapshot day: {snapshotDayLabel}
                 </p>
               </div>
 
@@ -503,3 +558,15 @@
     {/if}
   </section>
 </div>
+
+<SearchModal
+  bind:activeFilter
+  bind:isOpen={isFinderOpen}
+  bind:query={searchQuery}
+  entries={tickerDiscovery.entries}
+  options={tickerDiscovery.filterOptions}
+  recentEntries={tickerDiscovery.recentEntries}
+  {selectedSymbol}
+  {trendLabel}
+  onSelect={selectSymbol}
+/>

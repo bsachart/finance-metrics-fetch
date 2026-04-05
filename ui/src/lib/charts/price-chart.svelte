@@ -29,7 +29,7 @@
 
   type HoverState = {
     date: string;
-    priceLines: string[];
+    ohlcLine: string;
     volumeLine: string;
     vixLine: string | null;
   } | null;
@@ -78,7 +78,7 @@
       autoSize: true,
       crosshair: {
         horzLine: {
-          labelBackgroundColor: showVixPane ? vixColor : inkColor,
+          labelBackgroundColor: inkColor,
         },
         mode: 3,
         vertLine: {
@@ -104,9 +104,14 @@
         },
         textColor: inkColor,
       },
+      leftPriceScale: {
+        borderVisible: false,
+        visible: false,
+      },
       rightPriceScale: {
         borderVisible: false,
         textColor: inkColor,
+        visible: true,
       },
       timeScale: {
         borderVisible: false,
@@ -118,6 +123,7 @@
       {
         downColor: showVixPane ? "rgba(244, 63, 94, 0.82)" : "#f43f5e",
         borderVisible: false,
+        priceScaleId: "right",
         wickDownColor: showVixPane ? "rgba(244, 63, 94, 0.82)" : "#f43f5e",
         upColor: showVixPane ? "rgba(15, 118, 110, 0.82)" : "#0f766e",
         wickUpColor: showVixPane ? "rgba(15, 118, 110, 0.82)" : "#0f766e",
@@ -134,10 +140,11 @@
           minMove: 0.01,
           type: "custom",
         },
+        lastValueVisible: false,
+        priceScaleId: "volume",
         priceLineVisible: false,
-        title: "Dollar volume",
       },
-      1,
+      showVixPane ? 2 : 1,
     );
 
     vixSeries = showVixPane
@@ -151,10 +158,9 @@
             lineColor: vixColor,
             lineWidth: 2,
             priceLineVisible: false,
-            priceScaleId: "left",
+            priceScaleId: "right",
             topColor: withOpacity(vixColor, 0.16),
             bottomColor: withOpacity(vixColor, 0.04),
-            title: "VIX",
             autoscaleInfoProvider: vixAutoscaleInfoProvider,
           },
           1,
@@ -162,25 +168,34 @@
       : null;
 
     const panes = chart.panes();
-    panes[0]?.setStretchFactor(0.72);
-    panes[1]?.setStretchFactor(0.28);
+    panes[0]?.setStretchFactor(showVixPane ? 0.62 : 0.74);
+    panes[1]?.setStretchFactor(showVixPane ? 0.18 : 0.26);
+    panes[2]?.setStretchFactor(showVixPane ? 0.2 : 0);
 
+    chart.priceScale("right", 0).applyOptions({
+      borderVisible: false,
+      textColor: inkColor,
+      visible: true,
+    });
+    chart.priceScale("left", 0).applyOptions({
+      borderVisible: false,
+      visible: false,
+    });
     if (showVixPane) {
-      chart.applyOptions({
-        leftPriceScale: {
-          borderVisible: false,
-          textColor: vixColor,
-          visible: true,
-        },
+      chart.priceScale("right", 1).applyOptions({
+        borderVisible: false,
+        textColor: vixColor,
+        visible: true,
       });
-    } else {
-      chart.applyOptions({
-        leftPriceScale: {
-          borderVisible: false,
-          visible: false,
-        },
+      chart.priceScale("left", 1).applyOptions({
+        borderVisible: false,
+        visible: false,
       });
     }
+    chart.priceScale("volume", showVixPane ? 2 : 1).applyOptions({
+      borderVisible: false,
+      visible: false,
+    });
 
     syncSeries();
     chart.subscribeCrosshairMove(handleCrosshairMove);
@@ -232,16 +247,11 @@
 
     hoverState = {
       date: formatTime(param.time),
-      priceLines: [
-        `Open ${formatNumber(candle.open)}`,
-        `High ${formatNumber(candle.high)}`,
-        `Low ${formatNumber(candle.low)}`,
-        `Close ${formatNumber(candle.close)}`,
-      ],
-      volumeLine: `Dollar volume ${formatNumber(volume.value)}${getVolumeScale(points).suffix ? ` ${getVolumeScale(points).suffix}` : ""}`,
+      ohlcLine: `C ${formatNumber(candle.close)}   O ${formatNumber(candle.open)}   H ${formatNumber(candle.high)}   L ${formatNumber(candle.low)}`,
+      volumeLine: `Vol $${formatNumber(volume.value)}${getVolumeScale(points).suffix ? ` ${getVolumeScale(points).suffix}` : ""}`,
       vixLine:
         vixValue !== null
-          ? `VIX ${formatNumber(vixValue)}`
+          ? `${formatNumber(vixValue)}`
           : showVixPane
             ? "VIX unavailable"
             : null,
@@ -328,21 +338,10 @@
   {#if hoverState}
     <div class="chart-tooltip">
       <p class="chart-tooltip-date">{hoverState.date}</p>
-      <div class="chart-tooltip-group">
-        <p class="chart-tooltip-label">Price</p>
-        {#each hoverState.priceLines as line}
-          <p>{line}</p>
-        {/each}
-      </div>
-      <div class="chart-tooltip-group">
-        <p class="chart-tooltip-label">Volume</p>
-        <p>{hoverState.volumeLine}</p>
-      </div>
+      <p>{hoverState.ohlcLine}</p>
+      <p>{hoverState.volumeLine}</p>
       {#if hoverState.vixLine}
-        <div class="chart-tooltip-group">
-          <p class="chart-tooltip-label chart-tooltip-vix">Indicator</p>
-          <p class="chart-tooltip-vix">{hoverState.vixLine}</p>
-        </div>
+        <p class="chart-tooltip-vix">VIX {hoverState.vixLine}</p>
       {/if}
     </div>
   {/if}
@@ -356,19 +355,22 @@
   }
 
   .chart-root {
-    height: 520px;
+    height: 600px;
     width: 100%;
   }
 
   .chart-legend {
     align-items: center;
+    background: rgba(255, 255, 255, 0.82);
+    border-radius: 999px;
     display: flex;
     flex-wrap: wrap;
     gap: 0.875rem;
-    left: 0.75rem;
+    left: 3.5rem;
+    padding: 0.35rem 0.7rem;
     pointer-events: none;
     position: absolute;
-    top: 0.75rem;
+    top: 0.5rem;
     z-index: 2;
   }
 
@@ -396,7 +398,7 @@
     display: grid;
     gap: 0.2rem;
     max-width: min(34rem, calc(100% - 1.5rem));
-    padding: 0.65rem 0.85rem;
+    padding: 0.85rem 1rem;
     pointer-events: none;
     position: absolute;
     right: 0.75rem;
@@ -410,24 +412,9 @@
     margin: 0;
   }
 
-  .chart-tooltip-group {
-    display: grid;
-    gap: 0.15rem;
-    padding-top: 0.15rem;
-  }
-
   .chart-tooltip-date {
     font-weight: 600;
   }
-
-  .chart-tooltip-label {
-    color: rgba(19, 33, 47, 0.7);
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
   .chart-tooltip-vix {
     color: var(--vix-color, #7c5cff);
     font-weight: 600;

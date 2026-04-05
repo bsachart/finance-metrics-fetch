@@ -319,9 +319,14 @@ function buildTickerListEntry(
   aggregation: AggregationPeriod,
 ): TickerListEntry {
   const summarizedPoints = applyMarketView(points, lookback, aggregation);
+  const first = summarizedPoints[0] ?? null;
   const latest = summarizedPoints.at(-1) ?? null;
-  const previous = summarizedPoints.at(-2) ?? null;
-  const lastChange = latest && previous ? latest.close - previous.close : null;
+  const lastChange =
+    summarizedPoints.length > 1 && latest && first ? latest.close - first.close : null;
+  const lastChangePercent =
+    summarizedPoints.length > 1 && latest && first && first.close !== 0
+      ? ((latest.close - first.close) / first.close) * 100
+      : null;
 
   return {
     filterKeys,
@@ -329,12 +334,29 @@ function buildTickerListEntry(
     isRecent,
     label: option.label,
     lastChange,
+    lastChangePercent,
     lastClose: latest?.close ?? null,
     role: option.role,
     symbol: option.symbol,
     trendDirection: getTrendDirection(lastChange),
-    trendPoints: summarizedPoints.slice(-24).map((point) => point.close),
+    trendPoints: sampleTrendPoints(summarizedPoints, 24),
   };
+}
+
+function sampleTrendPoints(points: MarketPoint[], maxPoints: number): number[] {
+  if (points.length <= maxPoints) {
+    return points.map((point) => point.close);
+  }
+
+  const sampled: number[] = [];
+  const lastIndex = points.length - 1;
+
+  for (let sampleIndex = 0; sampleIndex < maxPoints; sampleIndex += 1) {
+    const pointIndex = Math.round((sampleIndex / (maxPoints - 1)) * lastIndex);
+    sampled.push(points[pointIndex]!.close);
+  }
+
+  return sampled;
 }
 
 function getTrendDirection(

@@ -148,6 +148,7 @@ describe("dashboard data orchestration", () => {
     expect(discovery.entries.map((entry) => entry.symbol)).toEqual(["MSFT"]);
     expect(discovery.recentEntries.map((entry) => entry.symbol)).toEqual(["MSFT"]);
     expect(discovery.recentEntries[0]?.isActive).toBe(true);
+    expect(discovery.recentEntries[0]?.lastChangePercent).toBeCloseTo(0.74, 2);
 
     const sp500Only = buildTickerDiscoveryState(
       payload.dashboard,
@@ -228,5 +229,53 @@ describe("dashboard data orchestration", () => {
     expect(daily.entries[0]?.trendDirection).toBe("down");
     expect(weekly.entries[0]?.trendPoints).toHaveLength(1);
     expect(weekly.entries[0]?.trendDirection).toBe("none");
+  });
+
+  it("uses the full active timeframe instead of only the latest bar window", async () => {
+    const marketRows = Array.from({ length: 40 }, (_, index) => {
+      const date = new Date(Date.UTC(2026, 1, index + 1)).toISOString().slice(0, 10);
+      const close = index < 20 ? 220 - index * 3 : 160 + (index - 20) * 5;
+      return `${date},VOO,${close},${close},${close},${close},100,100`;
+    }).join("\n");
+
+    const fetchFn = createFetch({
+      "/published/data/constituents/sp500.csv":
+        "index_name,symbol,name,sector,sub_industry,source_url\nsp500,VOO,Vanguard S&P 500 ETF,Financials,ETF,https://example.com",
+      "/published/data/market/VOO.csv":
+        `date,symbol,open,high,low,close,volume,quote_volume\n${marketRows}`,
+      "/published/asset-manifest.json": JSON.stringify({
+        indices: [{ enabled: true, has_constituents: true, key: "sp500", label: "S&P 500" }],
+        symbols: [{ enabled: true, has_market_data: true, label: "Vanguard S&P 500 ETF", role: "benchmark", symbol: "VOO" }],
+      }),
+      "/published/data/status/latest.json": JSON.stringify({
+        failed_sources: [],
+        failed_symbols: [],
+        finished_at: "2026-04-05T00:00:00Z",
+        messages: [],
+        refreshed_symbols: ["VOO"],
+        started_at: "2026-04-05T00:00:00Z",
+        status: "success",
+      }),
+      "/published/tickers.json": JSON.stringify({
+        indices: [{ enabled: true, key: "sp500", label: "S&P 500", source: "wikipedia" }],
+        tickers: [{ enabled: true, label: "Vanguard S&P 500 ETF", role: "benchmark", source: "x", symbol: "VOO" }],
+      }),
+    });
+
+    const payload = await loadDashboardData(fetchFn);
+    const discovery = buildTickerDiscoveryState(
+      payload.dashboard,
+      "",
+      "all",
+      "VOO",
+      [],
+      "ALL",
+      "1D",
+    );
+
+    expect(discovery.entries[0]?.trendPoints).toHaveLength(24);
+    expect(discovery.entries[0]?.lastChange).toBeGreaterThan(0);
+    expect(discovery.entries[0]?.lastChangePercent).toBeGreaterThan(0);
+    expect(discovery.entries[0]?.trendDirection).toBe("up");
   });
 });

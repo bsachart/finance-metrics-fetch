@@ -92,6 +92,7 @@ export interface TickerListEntry {
   isRecent: boolean;
   lastClose: number | null;
   lastChange: number | null;
+  lastChangePercent: number | null;
   trendPoints: number[];
   trendDirection: "up" | "down" | "flat" | "none";
 }
