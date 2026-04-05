@@ -6,7 +6,10 @@ from pathlib import Path
 
 import polars as pl
 
-from finance_metrics_fetch.publish.artifacts import write_constituents
+from finance_metrics_fetch.publish.artifacts import (
+    write_constituent_snapshot,
+    write_constituents,
+)
 
 
 def test_write_constituents_persists_stable_schema(tmp_path: Path, monkeypatch) -> None:
@@ -20,7 +23,6 @@ def test_write_constituents_persists_stable_schema(tmp_path: Path, monkeypatch) 
             "sector": ["Information Technology"],
             "sub_industry": ["Technology Hardware, Storage & Peripherals"],
             "source_url": ["https://example.com"],
-            "fetched_at": ["2026-04-05T00:00:00+00:00"],
         }
     )
 
@@ -28,7 +30,9 @@ def test_write_constituents_persists_stable_schema(tmp_path: Path, monkeypatch) 
 
     assert path.exists()
     content = path.read_text().splitlines()
-    assert (
-        content[0] == "index_name,symbol,name,sector,sub_industry,source_url,fetched_at"
-    )
+    assert content[0] == "index_name,symbol,name,sector,sub_industry,source_url"
     assert content[1].startswith("sp500,AAPL,Apple Inc.")
+
+    snapshot_path = write_constituent_snapshot("sp500", "2025-07-01", frame)
+    assert snapshot_path == Path("data/constituents/history/sp500/2025-07-01.csv")
+    assert snapshot_path.exists()

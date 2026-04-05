@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
-
 import polars as pl
 import requests
 from bs4 import BeautifulSoup
@@ -66,7 +64,6 @@ def _fetch_constituents(
     )
     rows = table.find_all("tr")
     records: list[dict[str, object]] = []
-    fetched_at = datetime.now(UTC).isoformat()
 
     for row in rows[1:]:
         cells = row.find_all(["th", "td"])
@@ -88,7 +85,6 @@ def _fetch_constituents(
                 "sub_industry": row_map.get("GICS Sub-Industry")
                 or row_map.get("ICB Subsector"),
                 "source_url": url,
-                "fetched_at": fetched_at,
             }
         )
 

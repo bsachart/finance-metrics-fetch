@@ -27,7 +27,21 @@ def test_run_refresh_writes_market_and_constituent_outputs(
                         "role": "benchmark",
                         "source": "yahoo_finance",
                     }
-                ]
+                ],
+                "indices": [
+                    {
+                        "key": "sp500",
+                        "label": "S&P 500",
+                        "enabled": True,
+                        "source": "wikipedia",
+                    },
+                    {
+                        "key": "nasdaq100",
+                        "label": "Nasdaq-100",
+                        "enabled": True,
+                        "source": "wikipedia",
+                    },
+                ],
             }
         )
     )
@@ -43,6 +57,8 @@ def test_run_refresh_writes_market_and_constituent_outputs(
     assert (tmp_path / "data/market/VOO.csv").exists()
     assert (tmp_path / "data/constituents/sp500.csv").exists()
     assert (tmp_path / "data/constituents/nasdaq100.csv").exists()
+    assert (tmp_path / "data/constituents/history/sp500/2026-04-05.csv").exists()
+    assert (tmp_path / "data/constituents/history/nasdaq100/2026-04-05.csv").exists()
     status = json.loads((tmp_path / "data/status/latest.json").read_text())
     assert status["status"] == "success"
     assert status["refreshed_symbols"] == ["VOO"]
@@ -72,7 +88,6 @@ def _sp500_frame() -> pl.DataFrame:
             "sector": ["Financials"],
             "sub_industry": ["Asset Management"],
             "source_url": ["https://example.com/sp500"],
-            "fetched_at": ["2026-04-05T00:00:00+00:00"],
         }
     )
 
@@ -86,6 +101,5 @@ def _nasdaq_frame() -> pl.DataFrame:
             "sector": ["Financials"],
             "sub_industry": ["Asset Management"],
             "source_url": ["https://example.com/nasdaq100"],
-            "fetched_at": ["2026-04-05T00:00:00+00:00"],
         }
     )

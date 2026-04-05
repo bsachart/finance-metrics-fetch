@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 import polars as pl
@@ -13,6 +14,7 @@ from finance_metrics_fetch.transforms.datasets import dataframe_to_json_records
 DATA_DIR = Path("data")
 MARKET_DIR = DATA_DIR / "market"
 CONSTITUENTS_DIR = DATA_DIR / "constituents"
+CONSTITUENT_HISTORY_DIR = CONSTITUENTS_DIR / "history"
 STATUS_DIR = DATA_DIR / "status"
 CONSTITUENT_COLUMNS = [
     "index_name",
@@ -21,7 +23,6 @@ CONSTITUENT_COLUMNS = [
     "sector",
     "sub_industry",
     "source_url",
-    "fetched_at",
 ]
 MARKET_COLUMNS = [
     "date",
@@ -47,6 +48,26 @@ def write_constituents(index_name: str, frame: pl.DataFrame) -> Path:
     """Write a normalized constituent CSV."""
     CONSTITUENTS_DIR.mkdir(parents=True, exist_ok=True)
     path = CONSTITUENTS_DIR / f"{index_name}.csv"
+    frame.select(CONSTITUENT_COLUMNS).sort("symbol").write_csv(path)
+    return path
+
+
+def write_constituent_snapshot(
+    index_name: str,
+    snapshot_date: date | datetime | str,
+    frame: pl.DataFrame,
+) -> Path:
+    """Write a dated constituent snapshot CSV."""
+    if isinstance(snapshot_date, datetime):
+        snapshot_label = snapshot_date.astimezone(UTC).date().isoformat()
+    elif isinstance(snapshot_date, date):
+        snapshot_label = snapshot_date.isoformat()
+    else:
+        snapshot_label = snapshot_date
+
+    snapshot_dir = CONSTITUENT_HISTORY_DIR / index_name
+    snapshot_dir.mkdir(parents=True, exist_ok=True)
+    path = snapshot_dir / f"{snapshot_label}.csv"
     frame.select(CONSTITUENT_COLUMNS).sort("symbol").write_csv(path)
     return path
 

@@ -22,7 +22,15 @@ def test_publish_command_validates_config_and_writes_status(tmp_path: Path) -> N
                         "role": "benchmark",
                         "source": "yahoo_finance",
                     }
-                ]
+                ],
+                "indices": [
+                    {
+                        "key": "sp500",
+                        "label": "S&P 500",
+                        "enabled": True,
+                        "source": "wikipedia",
+                    }
+                ],
             }
         )
     )

@@ -8,12 +8,14 @@ from pathlib import Path
 
 from finance_metrics_fetch.config import (
     DEFAULT_CONFIG_PATH,
+    enabled_indices,
     enabled_tickers,
     load_config,
 )
 from finance_metrics_fetch.errors import ConfigValidationError
-from finance_metrics_fetch.models import RefreshRunResult, RefreshStatus
+from finance_metrics_fetch.models import IndexConfig, RefreshRunResult, RefreshStatus
 from finance_metrics_fetch.publish.artifacts import (
+    write_constituent_snapshot,
     write_constituents,
     write_market_history,
     write_refresh_status,
@@ -65,6 +67,7 @@ def run_refresh(config_path: Path) -> int:
     try:
         document = load_config(config_path)
         tickers = enabled_tickers(document)
+        indices = enabled_indices(document)
 
         for ticker in tickers:
             try:
@@ -81,16 +84,17 @@ def run_refresh(config_path: Path) -> int:
                 failed_sources.append(ticker.source)
                 messages.append(f"{ticker.symbol}: {exc}")
 
-        for index_name, fetcher in (
-            ("sp500", fetch_sp500_constituents),
-            ("nasdaq100", fetch_nasdaq100_constituents),
-        ):
+        snapshot_date = started_at.date()
+        for index_config in indices:
             try:
+                fetcher = _constituent_fetcher_for(index_config)
+                index_name = index_config.key
                 frame = fetcher()
                 write_constituents(index_name, frame)
+                write_constituent_snapshot(index_name, snapshot_date, frame)
                 messages.append(f"{index_name}: constituents updated")
             except Exception as exc:  # pragma: no cover
-                failed_sources.append(index_name)
+                failed_sources.append(index_config.key)
                 messages.append(f"{index_name}: {exc}")
 
         finished_at = datetime.now(tz=UTC)
@@ -145,6 +149,7 @@ def _run_with_config(command_name: str, config_path: Path) -> int:
     try:
         document = load_config(config_path)
         tickers = enabled_tickers(document)
+        indices = enabled_indices(document)
         finished_at = datetime.now(tz=UTC)
         result = RefreshRunResult(
             started_at=started_at,
@@ -154,6 +159,7 @@ def _run_with_config(command_name: str, config_path: Path) -> int:
             messages=[
                 f"{command_name} configuration validated",
                 f"{len(tickers)} enabled tickers loaded",
+                f"{len(indices)} enabled indices loaded",
             ],
         )
         status_path = write_refresh_status(result)
@@ -197,6 +203,15 @@ def _write_failed_status(
     print(f"{command_name}: failed to validate configuration: {message}")
     print(f"status: {status_path}")
     return 1
+
+
+def _constituent_fetcher_for(index_config: IndexConfig):
+    """Return the constituent fetcher for a configured index."""
+    if index_config.key == "sp500":
+        return fetch_sp500_constituents
+    if index_config.key == "nasdaq100":
+        return fetch_nasdaq100_constituents
+    raise ValueError(f"Unsupported constituent index: {index_config.key}")
 
 
 if __name__ == "__main__":

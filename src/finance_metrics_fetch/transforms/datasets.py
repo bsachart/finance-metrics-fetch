@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, date, datetime
+from datetime import date, datetime
 
 import polars as pl
 
@@ -45,7 +45,6 @@ def normalize_constituents(index_name: str, frame: pl.DataFrame) -> pl.DataFrame
     available_sector = "sector" if "sector" in frame.columns else None
     available_sub_industry = "sub_industry" if "sub_industry" in frame.columns else None
     available_source_url = "source_url" if "source_url" in frame.columns else None
-    available_fetched_at = "fetched_at" if "fetched_at" in frame.columns else None
 
     return (
         frame.select(
@@ -67,11 +66,6 @@ def normalize_constituents(index_name: str, frame: pl.DataFrame) -> pl.DataFrame
                 if available_source_url
                 else pl.lit("")
             ).alias("source_url"),
-            (
-                pl.col(available_fetched_at).cast(pl.Utf8)
-                if available_fetched_at
-                else pl.lit(datetime.now(UTC).date().isoformat())
-            ).alias("fetched_at"),
         )
         .unique(subset=["index_name", "symbol"], keep="last", maintain_order=True)
         .sort("symbol")
