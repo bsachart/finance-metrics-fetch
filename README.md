@@ -15,6 +15,7 @@ data in a lightweight web UI.
 - Persist fetched datasets to repository-friendly files such as CSV or Markdown
 - Run scheduled and manual fetch workflows from GitHub Actions
 - Visualize price, quote-volume histograms, and VIX context in a Svelte UI
+  built with `https://www.shadcn-svelte.com/`
 
 ## Documentation
 

@@ -47,7 +47,7 @@ alerts, or portfolio features.
 ### Web UI
 
 - Framework: Svelte
-- Component system: shadcn-style Svelte components
+- Component system: `https://www.shadcn-svelte.com/`
 - Charting library: TradingView Lightweight Charts
 - Primary views:
   - price series
