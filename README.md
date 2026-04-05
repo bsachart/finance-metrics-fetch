@@ -59,10 +59,11 @@ npm run build
 The dashboard provides:
 
 - symbol and index discovery from packaged published assets
-- a compact ticker-first layout with the main chart at the top of the ticker workflow
-- a price, VIX, and dollar-volume chart with compact volume units
+- a search-first ticker workflow with compact results instead of a large symbol-card grid
+- recently viewed tickers and compact index-based filters for faster switching
+- a price, VIX, and dollar-volume chart with quieter volume styling and clearer VIX context
 - VIX shown by default with a simple hide toggle
-- local browser persistence for selected symbol, tab, lookback, bar period, index, and VIX toggle
+- local browser persistence for selected symbol, recent tickers, tab, timeframe, bar period, index, and VIX toggle
 - lookback presets such as `1W`, `1M`, `YTD`, `1Y`, and `5Y`
 - bar aggregation controls for `1D`, `1W`, and `1M`, defaulting to `1M` lookback and daily bars
 - separate `Tickers` and `Market Constituents` views
