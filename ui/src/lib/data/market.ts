@@ -166,6 +166,14 @@ export function formatChartHudDate(value: string): string {
   return parseUtcDate(value).toLocaleDateString("en-US", {
     day: "2-digit",
     month: "short",
+    year: "numeric",
+  });
+}
+
+export function formatChartAxisDate(value: string): string {
+  return parseUtcDate(value).toLocaleDateString("en-US", {
+    month: "short",
+    year: "2-digit",
   });
 }
 

@@ -7,6 +7,7 @@ import {
   buildCandlestickSeries,
   buildNormalizedQuoteVolumeSeries,
   buildPriceSeries,
+  formatChartAxisDate,
   formatChartHudDate,
   formatChartHudVolume,
   filterMarketPointsByLookback,
@@ -71,7 +72,8 @@ describe("market helpers", () => {
 
     expect(hudState?.close).toBe(510);
     expect(hudState?.source).toBe("latest");
-    expect(formatChartHudDate("2026-04-05")).toBe("Apr 05");
+    expect(formatChartHudDate("2026-04-05")).toBe("Apr 05, 2026");
+    expect(formatChartAxisDate("2026-04-05")).toBe("Apr 26");
     expect(formatChartHudVolume(255000, getVolumeScale(points))).toBe("$255 K");
   });
 });

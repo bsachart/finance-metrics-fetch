@@ -20,6 +20,7 @@
     buildChartHudState,
     buildNormalizedQuoteVolumeSeries,
     buildPriceSeries,
+    formatChartAxisDate,
     formatChartHudDate,
     formatVolumeAxisValue,
     getVolumeScale,
@@ -315,7 +316,7 @@
       return "";
     }
 
-    return formatChartHudDate(dateKey).replace(",", "");
+    return formatChartAxisDate(dateKey);
   }
 
   function getVixColor(seriesPoints: MarketPoint[]): string {

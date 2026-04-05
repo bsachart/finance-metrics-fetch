@@ -41,6 +41,34 @@
       "enabled": true,
       "role": "asset",
       "source": "yahoo_finance"
+    },
+    {
+      "symbol": "QQQ",
+      "label": "Invesco QQQ Trust",
+      "enabled": true,
+      "role": "asset",
+      "source": "yahoo_finance"
+    },
+    {
+      "symbol": "VEA",
+      "label": "Vanguard FTSE Developed Markets ETF",
+      "enabled": true,
+      "role": "asset",
+      "source": "yahoo_finance"
+    },
+    {
+      "symbol": "GLD",
+      "label": "SPDR Gold Shares",
+      "enabled": true,
+      "role": "asset",
+      "source": "yahoo_finance"
+    },
+    {
+      "symbol": "SLV",
+      "label": "iShares Silver Trust",
+      "enabled": true,
+      "role": "asset",
+      "source": "yahoo_finance"
     }
   ],
   "indices": [

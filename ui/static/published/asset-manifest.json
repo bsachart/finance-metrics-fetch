@@ -22,6 +22,13 @@
       "has_market_data": true
     },
     {
+      "symbol": "GLD",
+      "label": "SPDR Gold Shares",
+      "role": "asset",
+      "enabled": true,
+      "has_market_data": true
+    },
+    {
       "symbol": "GOOGL",
       "label": "Alphabet Class A",
       "role": "asset",
@@ -38,6 +45,27 @@
     {
       "symbol": "MSFT",
       "label": "Microsoft",
+      "role": "asset",
+      "enabled": true,
+      "has_market_data": true
+    },
+    {
+      "symbol": "QQQ",
+      "label": "Invesco QQQ Trust",
+      "role": "asset",
+      "enabled": true,
+      "has_market_data": true
+    },
+    {
+      "symbol": "SLV",
+      "label": "iShares Silver Trust",
+      "role": "asset",
+      "enabled": true,
+      "has_market_data": true
+    },
+    {
+      "symbol": "VEA",
+      "label": "Vanguard FTSE Developed Markets ETF",
       "role": "asset",
       "enabled": true,
       "has_market_data": true
