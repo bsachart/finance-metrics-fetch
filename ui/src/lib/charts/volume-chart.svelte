@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { AreaSeries, createChart, type IChartApi } from "lightweight-charts";
+  import {
+    AreaSeries,
+    createChart,
+    type IChartApi,
+    type ISeriesApi,
+  } from "lightweight-charts";
   import { onDestroy, onMount } from "svelte";
 
   import { buildQuoteVolumeSeries } from "$data/market";
@@ -9,11 +14,14 @@
 
   let host: HTMLDivElement;
   let chart: IChartApi | null = null;
+  let volumeSeries: ISeriesApi<"Area"> | null = null;
 
   function setupChart(): void {
     if (!host) {
       return;
     }
+
+    host.replaceChildren();
 
     chart = createChart(host, {
       autoSize: true,
@@ -30,31 +38,36 @@
       },
     });
 
-    const series = chart.addSeries(AreaSeries, {
+    volumeSeries = chart.addSeries(AreaSeries, {
       lineColor: "#13212f",
       lineWidth: 2,
       topColor: "rgba(19, 33, 47, 0.28)",
       bottomColor: "rgba(19, 33, 47, 0.02)",
       title: "Quote volume",
     });
-    series.setData(buildQuoteVolumeSeries(points));
-    chart.timeScale().fitContent();
+    syncSeries();
   }
 
-  function rerender(): void {
-    chart?.remove();
-    chart = null;
-    setupChart();
+  function syncSeries(): void {
+    if (!chart || !volumeSeries) {
+      return;
+    }
+
+    volumeSeries.setData(buildQuoteVolumeSeries(points));
+    chart.timeScale().fitContent();
   }
 
   onMount(setupChart);
 
-  $: if (chart) {
-    rerender();
+  $: points;
+  $: if (chart && volumeSeries) {
+    syncSeries();
   }
 
   onDestroy(() => {
     chart?.remove();
+    chart = null;
+    volumeSeries = null;
   });
 </script>
 

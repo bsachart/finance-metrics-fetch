@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { createChart, LineSeries, type IChartApi } from "lightweight-charts";
+  import {
+    createChart,
+    LineSeries,
+    type IChartApi,
+    type ISeriesApi,
+  } from "lightweight-charts";
   import { onDestroy, onMount } from "svelte";
 
   import { buildPriceSeries } from "$data/market";
@@ -10,21 +15,15 @@
 
   let host: HTMLDivElement;
   let chart: IChartApi | null = null;
-
-  function renderChart(): void {
-    if (!chart) {
-      return;
-    }
-
-    chart.remove();
-    chart = null;
-    setupChart();
-  }
+  let priceSeries: ISeriesApi<"Line"> | null = null;
+  let vixSeries: ISeriesApi<"Line"> | null = null;
 
   function setupChart(): void {
     if (!host) {
       return;
     }
+
+    host.replaceChildren();
 
     chart = createChart(host, {
       autoSize: true,
@@ -41,23 +40,29 @@
       },
     });
 
-    const priceSeries = chart.addSeries(LineSeries, {
+    priceSeries = chart.addSeries(LineSeries, {
       color: "#0f766e",
       lineWidth: 2,
       title: "Close",
     });
-    priceSeries.setData(buildPriceSeries(points));
+    vixSeries = chart.addSeries(LineSeries, {
+      color: "#bf6b34",
+      lineWidth: 2,
+      priceScaleId: "",
+      title: "VIX",
+    });
 
-    if (overlayPoints.length > 0) {
-      const vixSeries = chart.addSeries(LineSeries, {
-        color: "#bf6b34",
-        lineWidth: 2,
-        priceScaleId: "",
-        title: "VIX",
-      });
-      vixSeries.setData(buildPriceSeries(overlayPoints));
+    syncSeries();
+    chart.timeScale().fitContent();
+  }
+
+  function syncSeries(): void {
+    if (!chart || !priceSeries || !vixSeries) {
+      return;
     }
 
+    priceSeries.setData(buildPriceSeries(points));
+    vixSeries.setData(buildPriceSeries(overlayPoints));
     chart.timeScale().fitContent();
   }
 
@@ -65,12 +70,16 @@
     setupChart();
   });
 
-  $: if (chart) {
-    renderChart();
+  $: points, overlayPoints;
+  $: if (chart && priceSeries && vixSeries) {
+    syncSeries();
   }
 
   onDestroy(() => {
     chart?.remove();
+    chart = null;
+    priceSeries = null;
+    vixSeries = null;
   });
 </script>
 
