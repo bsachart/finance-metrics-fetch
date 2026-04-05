@@ -22,7 +22,13 @@
     pushRecentSymbol,
     sanitizeRecentSymbols,
   } from "$data/dashboard";
-  import type { ChartHudState, DashboardSection, TickerFilterKey } from "$data/types";
+  import type {
+    ChartHudState,
+    DashboardSection,
+    IndexOption,
+    SymbolOption,
+    TickerFilterKey,
+  } from "$data/types";
   import {
     Alert,
     AlertDescription,
@@ -48,6 +54,7 @@
     selectedIndexPreference?: string;
     selectedLookback?: LookbackPreset;
     selectedSymbol?: string | null;
+    showVolume?: boolean;
     showVix?: boolean;
   };
 
@@ -60,8 +67,10 @@
   let selectedIndex = getDefaultIndexKey();
   let selectedLookback: LookbackPreset = "1M";
   let selectedAggregation: AggregationPeriod = "1D";
+  let showVolume = true;
   let showVix = true;
   let hasLoadedPreferences = false;
+  let volumeToggleId = "show-volume";
   let vixToggleId = "show-vix";
   let hoverHudState: ChartHudState | null = null;
 
@@ -86,12 +95,15 @@
   $: availableSymbols = new Set(
     data.dashboard.symbolOptions
       .filter(
-        (option) => option.hasMarketData && option.symbol !== data.dashboard.vixSymbol,
+        (option: SymbolOption) =>
+          option.hasMarketData && option.symbol !== data.dashboard.vixSymbol,
       )
-      .map((option) => option.symbol),
+      .map((option: SymbolOption) => option.symbol),
   );
   $: selectedSymbolOption =
-    data.dashboard.symbolOptions.find((option) => option.symbol === selectedSymbol) ?? null;
+    data.dashboard.symbolOptions.find(
+      (option: SymbolOption) => option.symbol === selectedSymbol,
+    ) ?? null;
   $: selectedLatestPoint = rawMarketPoints.at(-1) ?? null;
   $: selectedLatestPrice = selectedLatestPoint
     ? selectedLatestPoint.close.toLocaleString("en-US", {
@@ -130,8 +142,8 @@
   }
   $: availableIndices = new Set(
     data.dashboard.indexOptions
-      .filter((option) => option.hasConstituents)
-      .map((option) => option.key),
+      .filter((option: IndexOption) => option.hasConstituents)
+      .map((option: IndexOption) => option.key),
   );
   $: if (!selectedIndex || !availableIndices.has(selectedIndex)) {
     selectedIndex = getDefaultIndexKey();
@@ -251,6 +263,10 @@
         showVix = preferences.showVix;
       }
 
+      if (typeof preferences.showVolume === "boolean") {
+        showVolume = preferences.showVolume;
+      }
+
       if (preferences.selectedSymbol && availableSymbols.has(preferences.selectedSymbol)) {
         selectedSymbol = preferences.selectedSymbol;
       }
@@ -283,6 +299,7 @@
       selectedIndexPreference: selectedIndex,
       selectedLookback,
       selectedSymbol,
+      showVolume,
       showVix,
     };
 
@@ -300,9 +317,9 @@
   function getDefaultIndexKey(): string {
     return (
       data.dashboard.indexOptions.find(
-        (option) => option.hasConstituents && option.key === "sp500",
+        (option: IndexOption) => option.hasConstituents && option.key === "sp500",
       )?.key ??
-      data.dashboard.indexOptions.find((option) => option.hasConstituents)?.key ??
+      data.dashboard.indexOptions.find((option: IndexOption) => option.hasConstituents)?.key ??
       ""
     );
   }
@@ -424,7 +441,7 @@
                     </button>
                   </div>
 
-                  <div class="grid gap-4 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,0.8fr)_auto]">
+                  <div class="grid gap-4 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,0.8fr)_auto_auto]">
                     <div>
                       <p class="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
                         Timeframe
@@ -470,6 +487,36 @@
                     <div>
                       <label
                         class={`inline-flex min-w-[8rem] items-center justify-between gap-3 rounded-full border px-3 py-2 text-sm transition ${
+                          showVolume
+                            ? "border-ring bg-accent/70 text-foreground"
+                            : "bg-background/70 text-muted-foreground hover:border-ring/40 hover:text-foreground"
+                        } cursor-pointer`}
+                        for={volumeToggleId}
+                      >
+                        <span>Vol</span>
+                        <span
+                          class={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
+                            showVolume ? "bg-primary" : "bg-muted"
+                          }`}
+                        >
+                          <input
+                            bind:checked={showVolume}
+                            class="sr-only"
+                            id={volumeToggleId}
+                            type="checkbox"
+                          />
+                          <span
+                            class={`h-4 w-4 rounded-full bg-white shadow-sm transition ${
+                              showVolume ? "translate-x-6" : "translate-x-1"
+                            }`}
+                          ></span>
+                        </span>
+                      </label>
+                    </div>
+
+                    <div>
+                      <label
+                        class={`inline-flex min-w-[8rem] items-center justify-between gap-3 rounded-full border px-3 py-2 text-sm transition ${
                           showVixOverlay || (showVix && !hasAnyVixData)
                             ? "border-ring bg-accent/70 text-foreground"
                             : "bg-background/70 text-muted-foreground hover:border-ring/40 hover:text-foreground"
@@ -500,13 +547,15 @@
                   </div>
 
                   {#if displayedHudState}
-                    <div class="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-[18px] border bg-card/78 px-4 py-3 font-mono text-sm">
+                    <div class="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-[18px] border bg-card/78 px-4 py-3 text-sm">
                       <span class="text-muted-foreground">{formatChartHudDate(displayedHudState.date)}</span>
                       <span><span class="text-muted-foreground">O</span> {formatChartHudPrice(displayedHudState.open)}</span>
                       <span><span class="text-muted-foreground">H</span> {formatChartHudPrice(displayedHudState.high)}</span>
                       <span><span class="text-muted-foreground">L</span> {formatChartHudPrice(displayedHudState.low)}</span>
                       <span><span class="text-muted-foreground">C</span> {formatChartHudPrice(displayedHudState.close)}</span>
-                      <span class="text-blue-600">Vol {formatChartHudVolume(displayedHudState.quoteVolume, volumeScale)}</span>
+                      {#if showVolume}
+                        <span class="text-blue-600">Vol {formatChartHudVolume(displayedHudState.quoteVolume, volumeScale)}</span>
+                      {/if}
                       {#if displayedHudState.vix !== null}
                         <span class="text-amber-600">VIX {formatChartHudPrice(displayedHudState.vix)}</span>
                       {/if}
@@ -521,6 +570,7 @@
                 <PriceChart
                   onHudChange={handleHudChange}
                   points={marketPoints}
+                  showVolume={showVolume}
                   showVix={showVixOverlay}
                   vixPoints={showVixOverlay ? vixPoints : []}
                 />
@@ -546,7 +596,7 @@
         </TabsContent>
 
         <TabsContent class="mt-0 grid gap-4" value="constituents">
-          {#if data.dashboard.indexOptions.some((option) => option.hasConstituents)}
+          {#if data.dashboard.indexOptions.some((option: IndexOption) => option.hasConstituents)}
             <Card class="space-y-4 rounded-[28px] border bg-card/90 p-6 shadow-[0_18px_50px_rgba(18,26,33,0.12)]">
               <div>
                 <h2 class="font-heading text-xl font-semibold tracking-tight md:text-2xl">
@@ -559,7 +609,7 @@
 
               <Tabs bind:value={selectedIndex} class="gap-4">
                 <TabsList class="rounded-full p-1" variant="default">
-                  {#each data.dashboard.indexOptions.filter((option) => option.hasConstituents) as option}
+                  {#each data.dashboard.indexOptions.filter((option: IndexOption) => option.hasConstituents) as option}
                     <TabsTrigger class="rounded-full px-4 text-sm" value={option.key}>
                       {option.label}
                     </TabsTrigger>
@@ -567,7 +617,7 @@
                 </TabsList>
 
                 <ConstituentTable
-                  indexLabel={data.dashboard.indexOptions.find((option) => option.key === selectedIndex)?.label ?? selectedIndex}
+                  indexLabel={data.dashboard.indexOptions.find((option: IndexOption) => option.key === selectedIndex)?.label ?? selectedIndex}
                   records={data.dashboard.constituentsByIndex[selectedIndex] ?? []}
                 />
               </Tabs>

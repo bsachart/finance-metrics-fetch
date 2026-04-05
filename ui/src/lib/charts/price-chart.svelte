@@ -27,6 +27,7 @@
   import type { ChartHudState, MarketPoint } from "$data/types";
 
   export let points: MarketPoint[] = [];
+  export let showVolume = true;
   export let showVix = false;
   export let vixPoints: MarketPoint[] = [];
   export let onHudChange: (state: ChartHudState | null) => void = () => {};
@@ -59,6 +60,7 @@
   $: sortedPoints = sortPoints(points);
   $: sortedVixPoints = sortPoints(vixPoints);
   $: showVixPane = showVix && sortedVixPoints.length > 0;
+  $: showAnalyticsPane = showVolume || showVixPane;
   $: vixColor = getVixColor(sortedVixPoints);
   $: pointByDate = new Map(sortedPoints.map((point) => [point.date, point]));
   $: vixPointByDate = new Map(sortedVixPoints.map((point) => [point.date, point]));
@@ -141,6 +143,24 @@
       0,
     );
 
+    volumeSeries = showVolume
+      ? chart.addSeries(
+          HistogramSeries,
+          {
+            base: 0,
+            lastValueVisible: false,
+            priceFormat: {
+              formatter: (value: number) => formatVolumeAxisValue(value, getVolumeScale(sortedPoints)),
+              minMove: 0.01,
+              type: "custom",
+            },
+            priceLineVisible: false,
+            priceScaleId: "right",
+          },
+          1,
+        )
+      : null;
+
     vixSeries = showVixPane
       ? chart.addSeries(
           AreaSeries,
@@ -152,7 +172,7 @@
             lineColor: vixColor,
             lineWidth: 2,
             priceLineVisible: false,
-            priceScaleId: "right",
+            priceScaleId: "left",
             topColor: withOpacity(vixColor, 0.16),
             bottomColor: withOpacity(vixColor, 0.04),
             autoscaleInfoProvider: vixAutoscaleInfoProvider,
@@ -161,26 +181,9 @@
         )
       : null;
 
-    volumeSeries = chart.addSeries(
-      HistogramSeries,
-      {
-        base: 0,
-        lastValueVisible: false,
-        priceFormat: {
-          formatter: (value: number) => formatVolumeAxisValue(value, getVolumeScale(sortedPoints)),
-          minMove: 0.01,
-          type: "custom",
-        },
-        priceLineVisible: false,
-        priceScaleId: "volume",
-      },
-      showVixPane ? 2 : 1,
-    );
-
     const panes = chart.panes();
-    panes[0]?.setStretchFactor(showVixPane ? 0.64 : 0.76);
-    panes[1]?.setStretchFactor(showVixPane ? 0.16 : 0.24);
-    panes[2]?.setStretchFactor(showVixPane ? 0.2 : 0);
+    panes[0]?.setStretchFactor(showAnalyticsPane ? 0.76 : 1);
+    panes[1]?.setStretchFactor(showAnalyticsPane ? 0.24 : 0);
 
     chart.priceScale("left", 0).applyOptions({
       borderVisible: false,
@@ -196,8 +199,8 @@
       visible: false,
     });
 
-    if (showVixPane) {
-      chart.priceScale("right", 1).applyOptions({
+    if (showVixPane && panes[1]) {
+      chart.priceScale("left", 1).applyOptions({
         borderVisible: false,
         scaleMargins: {
           top: 0.1,
@@ -206,42 +209,47 @@
         textColor: vixColor,
         visible: true,
       });
+    } else if (panes[1]) {
       chart.priceScale("left", 1).applyOptions({
         borderVisible: false,
         visible: false,
       });
     }
 
-    chart.priceScale("volume", showVixPane ? 2 : 1).applyOptions({
-      borderVisible: false,
-      scaleMargins: {
-        top: 0.2,
-        bottom: 0,
-      },
-      textColor: volumeColor,
-      visible: true,
-    });
+    if (panes[1]) {
+      chart.priceScale("right", 1).applyOptions({
+        borderVisible: false,
+        scaleMargins: {
+          top: 0.2,
+          bottom: 0,
+        },
+        textColor: volumeColor,
+        visible: showVolume,
+      });
+    }
 
     syncSeries();
     chart.subscribeCrosshairMove(handleCrosshairMove);
   }
 
   function syncSeries(): void {
-    if (!chart || !priceSeries || !volumeSeries) {
+    if (!chart || !priceSeries) {
       return;
     }
 
     const volumeScale = getVolumeScale(sortedPoints);
 
     priceSeries.setData(buildCandlestickSeries(sortedPoints));
-    volumeSeries.applyOptions({
-      priceFormat: {
-        formatter: (value: number) => formatVolumeAxisValue(value, volumeScale),
-        minMove: 0.01,
-        type: "custom",
-      },
-    });
-    volumeSeries.setData(buildNormalizedQuoteVolumeSeries(sortedPoints, volumeScale));
+    if (volumeSeries) {
+      volumeSeries.applyOptions({
+        priceFormat: {
+          formatter: (value: number) => formatVolumeAxisValue(value, volumeScale),
+          minMove: 0.01,
+          type: "custom",
+        },
+      });
+      volumeSeries.setData(buildNormalizedQuoteVolumeSeries(sortedPoints, volumeScale));
+    }
 
     if (showVixPane && vixSeries) {
       vixSeries.applyOptions({
@@ -250,7 +258,7 @@
         bottomColor: withOpacity(vixColor, 0.04),
       });
       vixSeries.setData(buildPriceSeries(sortedVixPoints));
-    } else {
+    } else if (vixSeries) {
       vixSeries?.setData([]);
     }
 
@@ -332,6 +340,7 @@
   $: if (mounted) {
     points;
     vixPoints;
+    showVolume;
     showVix;
     setupChart();
   }
