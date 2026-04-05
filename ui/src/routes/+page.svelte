@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { invalidateAll } from "$app/navigation";
   import PriceChart from "$charts/price-chart.svelte";
   import VolumeChart from "$charts/volume-chart.svelte";
   import Card from "$components/ui/card.svelte";
@@ -10,10 +11,13 @@
   import SymbolSelector from "$components/symbol-selector.svelte";
   import VixContext from "$components/vix-context.svelte";
   import { buildSummaryMetrics } from "$data/market";
+  import { onMount } from "svelte";
 
   import type { PageData } from "./$types";
 
   export let data: PageData;
+
+  const refreshIntervalMs = 60_000;
 
   let selectedSymbol = data.defaultSymbol;
   let activePanel: "market" | "distribution" | "constituents" = "market";
@@ -25,6 +29,29 @@
       ? data.dashboard.marketBySymbol[data.dashboard.vixSymbol] ?? []
       : [];
   $: summaryMetrics = buildSummaryMetrics(marketPoints);
+  $: availableSymbols = new Set(Object.keys(data.dashboard.marketBySymbol));
+  $: if (!selectedSymbol || !availableSymbols.has(selectedSymbol)) {
+    selectedSymbol = data.defaultSymbol;
+  }
+
+  onMount(() => {
+    const intervalId = window.setInterval(() => {
+      void invalidateAll();
+    }, refreshIntervalMs);
+
+    const handleVisibilityChange = (): void => {
+      if (document.visibilityState === "visible") {
+        void invalidateAll();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.clearInterval(intervalId);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  });
 </script>
 
 <svelte:head>
@@ -37,12 +64,11 @@
 
 <div class="page-shell">
   <header>
-    <p class="eyebrow">GitHub Pages ready</p>
     <h1 class="hero-title">Market history from the repository, not a live backend.</h1>
     <p class="hero-copy">
-      This UI packages the committed `data/` artifacts into a static dashboard so you can
-      inspect price, quote volume, volatility context, and index constituents from the same
-      place.
+      This dashboard reads the published repository data, refreshes it automatically, and
+      lets you inspect price, quote volume, volatility context, and index constituents from
+      the same place.
     </p>
   </header>
 
