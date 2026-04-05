@@ -5,6 +5,7 @@
     type AutoscaleInfoProvider,
     CandlestickSeries,
     HistogramSeries,
+    LineStyle,
     createChart,
     type IChartApi,
     type MouseEventParams,
@@ -28,15 +29,18 @@
 
   type HoverState = {
     date: string;
-    ohlc: string;
-    volume: string;
-    vix: string;
+    priceLines: string[];
+    volumeLine: string;
+    vixLine: string | null;
   } | null;
 
   const inkColor = "#13212f";
+  const mutedGridColor = "rgba(19, 33, 47, 0.09)";
   const mutedVixColor = "#7c5cff";
   const elevatedVixColor = "#d97706";
   const elevatedVixThreshold = 20;
+  const priceLegendColor = "#0f766e";
+  const volumeLegendColor = "rgba(59, 130, 246, 0.7)";
   const vixAutoscaleInfoProvider: AutoscaleInfoProvider = (
     original: () => AutoscaleInfo | null,
   ) => {
@@ -55,6 +59,8 @@
   let vixSeries: ISeriesApi<"Area"> | null = null;
   let hoverState: HoverState = null;
   let mounted = false;
+  $: showVixPane = showVix && vixPoints.length > 0;
+  $: vixColor = getVixColor(vixPoints);
 
   function setupChart(): void {
     if (!host || !wrapper) {
@@ -68,25 +74,33 @@
     vixSeries = null;
     hoverState = null;
 
-    const showVixPane = showVix && vixPoints.length > 0;
-    const vixColor = getVixColor(vixPoints);
     chart = createChart(host, {
       autoSize: true,
       crosshair: {
         horzLine: {
-          labelBackgroundColor: vixColor,
+          labelBackgroundColor: showVixPane ? vixColor : inkColor,
         },
         mode: 3,
         vertLine: {
           labelBackgroundColor: inkColor,
         },
       },
+      grid: {
+        vertLines: {
+          color: mutedGridColor,
+          style: LineStyle.LargeDashed,
+        },
+        horzLines: {
+          color: mutedGridColor,
+          style: LineStyle.LargeDashed,
+        },
+      },
       layout: {
         attributionLogo: false,
         background: { color: "transparent" },
         panes: {
-          separatorColor: "rgba(19, 33, 47, 0.12)",
-          separatorHoverColor: "rgba(19, 33, 47, 0.18)",
+          separatorColor: "rgba(19, 33, 47, 0.08)",
+          separatorHoverColor: "rgba(19, 33, 47, 0.12)",
         },
         textColor: inkColor,
       },
@@ -123,7 +137,7 @@
         priceLineVisible: false,
         title: "Dollar volume",
       },
-      showVixPane ? 2 : 1,
+      1,
     );
 
     vixSeries = showVixPane
@@ -148,13 +162,8 @@
       : null;
 
     const panes = chart.panes();
-    panes[0]?.setStretchFactor(showVixPane ? 0.56 : 0.72);
-    if (showVixPane) {
-      panes[1]?.setStretchFactor(0.16);
-      panes[2]?.setStretchFactor(0.28);
-    } else {
-      panes[1]?.setStretchFactor(0.28);
-    }
+    panes[0]?.setStretchFactor(0.72);
+    panes[1]?.setStretchFactor(0.28);
 
     if (showVixPane) {
       chart.applyOptions({
@@ -183,8 +192,7 @@
     }
 
     const volumeScale = getVolumeScale(points);
-    const hasVix = showVix && vixPoints.length > 0;
-    const vixColor = getVixColor(vixPoints);
+    const hasVix = showVixPane;
 
     priceSeries.setData(buildCandlestickSeries(points));
     volumeSeries.applyOptions({
@@ -224,13 +232,19 @@
 
     hoverState = {
       date: formatTime(param.time),
-      ohlc: `O ${formatNumber(candle.open)}  H ${formatNumber(candle.high)}  L ${formatNumber(candle.low)}  C ${formatNumber(candle.close)}`,
-      volume: `Dollar volume ${formatNumber(volume.value)}${getVolumeScale(points).suffix ? ` ${getVolumeScale(points).suffix}` : ""}`,
-      vix: vixValue
-        ? `VIX ${formatNumber(vixValue)}`
-        : showVix && vixPoints.length > 0
-          ? "VIX unavailable"
-          : "",
+      priceLines: [
+        `Open ${formatNumber(candle.open)}`,
+        `High ${formatNumber(candle.high)}`,
+        `Low ${formatNumber(candle.low)}`,
+        `Close ${formatNumber(candle.close)}`,
+      ],
+      volumeLine: `Dollar volume ${formatNumber(volume.value)}${getVolumeScale(points).suffix ? ` ${getVolumeScale(points).suffix}` : ""}`,
+      vixLine:
+        vixValue !== null
+          ? `VIX ${formatNumber(vixValue)}`
+          : showVixPane
+            ? "VIX unavailable"
+            : null,
     };
   }
 
@@ -293,20 +307,20 @@
   });
 </script>
 
-<div bind:this={wrapper} class="chart-shell">
+<div bind:this={wrapper} class="chart-shell" style={`--vix-color: ${vixColor};`}>
   <div class="chart-legend">
     <span class="legend-item">
-      <span class="legend-swatch legend-swatch-price"></span>
+      <span class="legend-swatch" style={`background: ${priceLegendColor};`}></span>
       Price
     </span>
-    {#if showVix && vixPoints.length > 0}
+    {#if showVixPane}
       <span class="legend-item">
-        <span class="legend-swatch legend-swatch-vix"></span>
+        <span class="legend-swatch" style={`background: ${vixColor};`}></span>
         VIX
       </span>
     {/if}
     <span class="legend-item">
-      <span class="legend-swatch legend-swatch-volume"></span>
+      <span class="legend-swatch" style={`background: ${volumeLegendColor};`}></span>
       Dollar volume
     </span>
   </div>
@@ -314,10 +328,21 @@
   {#if hoverState}
     <div class="chart-tooltip">
       <p class="chart-tooltip-date">{hoverState.date}</p>
-      <p>{hoverState.ohlc}</p>
-      <p>{hoverState.volume}</p>
-      {#if hoverState.vix}
-        <p class="chart-tooltip-vix">{hoverState.vix}</p>
+      <div class="chart-tooltip-group">
+        <p class="chart-tooltip-label">Price</p>
+        {#each hoverState.priceLines as line}
+          <p>{line}</p>
+        {/each}
+      </div>
+      <div class="chart-tooltip-group">
+        <p class="chart-tooltip-label">Volume</p>
+        <p>{hoverState.volumeLine}</p>
+      </div>
+      {#if hoverState.vixLine}
+        <div class="chart-tooltip-group">
+          <p class="chart-tooltip-label chart-tooltip-vix">Indicator</p>
+          <p class="chart-tooltip-vix">{hoverState.vixLine}</p>
+        </div>
       {/if}
     </div>
   {/if}
@@ -349,15 +374,11 @@
 
   .legend-item {
     align-items: center;
-    background: rgba(255, 255, 255, 0.92);
-    border: 1px solid rgba(19, 33, 47, 0.12);
-    border-radius: 999px;
     color: #13212f;
     display: inline-flex;
     font-size: 0.75rem;
     font-weight: 500;
     gap: 0.45rem;
-    padding: 0.3rem 0.65rem;
   }
 
   .legend-swatch {
@@ -365,18 +386,6 @@
     display: inline-block;
     height: 0.55rem;
     width: 0.55rem;
-  }
-
-  .legend-swatch-price {
-    background: #0f766e;
-  }
-
-  .legend-swatch-vix {
-    background: #7c5cff;
-  }
-
-  .legend-swatch-volume {
-    background: rgba(15, 118, 110, 0.62);
   }
 
   .chart-tooltip {
@@ -401,12 +410,26 @@
     margin: 0;
   }
 
+  .chart-tooltip-group {
+    display: grid;
+    gap: 0.15rem;
+    padding-top: 0.15rem;
+  }
+
   .chart-tooltip-date {
     font-weight: 600;
   }
 
+  .chart-tooltip-label {
+    color: rgba(19, 33, 47, 0.7);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
   .chart-tooltip-vix {
-    color: #7c5cff;
+    color: var(--vix-color, #7c5cff);
     font-weight: 600;
   }
 </style>

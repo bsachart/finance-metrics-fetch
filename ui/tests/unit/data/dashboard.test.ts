@@ -136,6 +136,8 @@ describe("dashboard data orchestration", () => {
       "all",
       "MSFT",
       recentSymbols,
+      "1M",
+      "1D",
     );
 
     expect(discovery.filterOptions.map((option) => option.key)).toEqual([
@@ -153,8 +155,78 @@ describe("dashboard data orchestration", () => {
       "sp500",
       "VOO",
       [],
+      "1M",
+      "1D",
     );
 
     expect(sp500Only.entries.map((entry) => entry.symbol)).toEqual(["VOO"]);
+    expect(sp500Only.entries[0]?.trendDirection).toBe("down");
+  });
+
+  it("rebuilds ticker trend summaries for the active timeframe and aggregation", async () => {
+    const fetchFn = createFetch({
+      "/published/data/constituents/nasdaq100.csv":
+        "index_name,symbol,name,sector,sub_industry,source_url\nnasdaq100,MSFT,Microsoft,Information Technology,Software,https://example.com",
+      "/published/data/constituents/sp500.csv":
+        "index_name,symbol,name,sector,sub_industry,source_url\nsp500,VOO,Vanguard S&P 500 ETF,Financials,ETF,https://example.com",
+      "/published/data/market/%5EVIX.csv":
+        "date,symbol,open,high,low,close,volume,quote_volume\n2026-03-30,^VIX,20,21,19,19.5,10,195\n2026-04-01,^VIX,20,21,19,21.5,10,215",
+      "/published/data/market/VOO.csv":
+        "date,symbol,open,high,low,close,volume,quote_volume\n2026-03-31,VOO,500,505,498,503,100,50300\n2026-04-01,VOO,503,506,500,507,100,50700\n2026-04-02,VOO,507,508,501,502,100,50200",
+      "/published/asset-manifest.json": JSON.stringify({
+        indices: [
+          { enabled: true, has_constituents: true, key: "sp500", label: "S&P 500" },
+          { enabled: true, has_constituents: true, key: "nasdaq100", label: "Nasdaq-100" },
+        ],
+        symbols: [
+          { enabled: true, has_market_data: true, label: "CBOE Volatility Index", role: "volatility", symbol: "^VIX" },
+          { enabled: true, has_market_data: true, label: "Vanguard S&P 500 ETF", role: "benchmark", symbol: "VOO" },
+        ],
+      }),
+      "/published/data/status/latest.json": JSON.stringify({
+        failed_sources: [],
+        failed_symbols: [],
+        finished_at: "2026-04-05T00:00:00Z",
+        messages: [],
+        refreshed_symbols: ["VOO", "^VIX"],
+        started_at: "2026-04-05T00:00:00Z",
+        status: "success",
+      }),
+      "/published/tickers.json": JSON.stringify({
+        indices: [
+          { enabled: true, key: "sp500", label: "S&P 500", source: "wikipedia" },
+          { enabled: true, key: "nasdaq100", label: "Nasdaq-100", source: "wikipedia" },
+        ],
+        tickers: [
+          { enabled: true, label: "CBOE Volatility Index", role: "volatility", source: "x", symbol: "^VIX" },
+          { enabled: true, label: "Vanguard S&P 500 ETF", role: "benchmark", source: "x", symbol: "VOO" },
+        ],
+      }),
+    });
+
+    const payload = await loadDashboardData(fetchFn);
+    const daily = buildTickerDiscoveryState(
+      payload.dashboard,
+      "",
+      "all",
+      "VOO",
+      [],
+      "1M",
+      "1D",
+    );
+    const weekly = buildTickerDiscoveryState(
+      payload.dashboard,
+      "",
+      "all",
+      "VOO",
+      [],
+      "1M",
+      "1W",
+    );
+
+    expect(daily.entries[0]?.trendPoints).toHaveLength(3);
+    expect(daily.entries[0]?.trendDirection).toBe("down");
+    expect(weekly.entries[0]?.trendPoints).toHaveLength(1);
+    expect(weekly.entries[0]?.trendDirection).toBe("none");
   });
 });

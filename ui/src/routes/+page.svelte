@@ -93,7 +93,10 @@
     activeFilter,
     selectedSymbol,
     recentSymbols,
+    selectedLookback,
+    selectedAggregation,
   );
+  $: trendLabel = `Trend (${selectedLookback})`;
   $: recentSymbols = sanitizeRecentSymbols(data.dashboard, recentSymbols);
   $: hasAnyVixData = Boolean(data.dashboard.vixSymbol && vixPoints.length > 0);
   $: showVixOverlay = shouldDisplayVixOverlay(
@@ -405,15 +408,6 @@
                     </div>
                   </div>
 
-                  <p class="text-sm text-muted-foreground">
-                    {#if showVixOverlay}
-                      {data.dashboard.vixSymbol} is shown as chart context for {selectedSymbol}.
-                    {:else if hasAnyVixData}
-                      {data.dashboard.vixSymbol} is hidden.
-                    {:else}
-                      VIX data is unavailable in the published snapshot.
-                    {/if}
-                  </p>
                 </div>
               </div>
             </div>
@@ -438,6 +432,7 @@
             <TickerList
               entries={tickerDiscovery.entries}
               {selectedSymbol}
+              {trendLabel}
               onSelect={selectSymbol}
             />
           </Card>

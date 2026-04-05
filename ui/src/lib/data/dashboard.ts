@@ -4,6 +4,11 @@ import {
   loadMarketCsv,
   loadStatus,
 } from "./loaders";
+import {
+  applyMarketView,
+  type AggregationPeriod,
+  type LookbackPreset,
+} from "./market";
 import type {
   DashboardData,
   MarketPoint,
@@ -196,6 +201,8 @@ export function buildTickerDiscoveryState(
   activeFilter: TickerFilterKey,
   selectedSymbol: string | null,
   recentSymbols: string[],
+  lookback: LookbackPreset,
+  aggregation: AggregationPeriod,
 ): TickerDiscoveryState {
   const validRecentSymbols = sanitizeRecentSymbols(dashboard, recentSymbols);
   const recentSet = new Set(validRecentSymbols);
@@ -213,6 +220,8 @@ export function buildTickerDiscoveryState(
         dashboard.filterMembershipBySymbol[option.symbol] ?? ["all"],
         option.symbol === selectedSymbol,
         recentSet.has(option.symbol),
+        lookback,
+        aggregation,
       ),
     );
 
@@ -306,22 +315,44 @@ function buildTickerListEntry(
   filterKeys: TickerFilterKey[],
   isActive: boolean,
   isRecent: boolean,
+  lookback: LookbackPreset,
+  aggregation: AggregationPeriod,
 ): TickerListEntry {
-  const latest = points.at(-1) ?? null;
-  const previous = points.at(-2) ?? null;
+  const summarizedPoints = applyMarketView(points, lookback, aggregation);
+  const latest = summarizedPoints.at(-1) ?? null;
+  const previous = summarizedPoints.at(-2) ?? null;
+  const lastChange = latest && previous ? latest.close - previous.close : null;
 
   return {
     filterKeys,
     isActive,
     isRecent,
     label: option.label,
-    lastChange:
-      latest && previous ? latest.close - previous.close : null,
+    lastChange,
     lastClose: latest?.close ?? null,
     role: option.role,
     symbol: option.symbol,
-    trendPoints: points.slice(-20).map((point) => point.close),
+    trendDirection: getTrendDirection(lastChange),
+    trendPoints: summarizedPoints.slice(-24).map((point) => point.close),
   };
+}
+
+function getTrendDirection(
+  change: number | null,
+): "up" | "down" | "flat" | "none" {
+  if (change === null) {
+    return "none";
+  }
+
+  if (change > 0) {
+    return "up";
+  }
+
+  if (change < 0) {
+    return "down";
+  }
+
+  return "flat";
 }
 
 function matchesTickerQuery(entry: TickerListEntry, query: string): boolean {

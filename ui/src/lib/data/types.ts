@@ -93,6 +93,7 @@ export interface TickerListEntry {
   lastClose: number | null;
   lastChange: number | null;
   trendPoints: number[];
+  trendDirection: "up" | "down" | "flat" | "none";
 }
 
 export interface TickerDiscoveryState {

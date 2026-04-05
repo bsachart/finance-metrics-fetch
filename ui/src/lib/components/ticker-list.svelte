@@ -5,7 +5,12 @@
 
   export let entries: TickerListEntry[] = [];
   export let selectedSymbol: string | null = null;
+  export let trendLabel = "Trend";
   export let onSelect: (symbol: string) => void = () => {};
+
+  const positiveTrendColor = "#0f766e";
+  const negativeTrendColor = "#dc2626";
+  const flatTrendColor = "#64748b";
 
   function formatPrice(value: number | null): string {
     if (value === null) {
@@ -32,17 +37,31 @@
       return "";
     }
 
-    const min = Math.min(...points);
-    const max = Math.max(...points);
+    const baseline = points[0] ?? 0;
+    const relativePoints = points.map((point) => point - baseline);
+    const min = Math.min(...relativePoints, 0);
+    const max = Math.max(...relativePoints, 0);
     const span = max - min || 1;
 
-    return points
+    return relativePoints
       .map((point, index) => {
         const x = (index / (points.length - 1)) * 100;
         const y = 24 - ((point - min) / span) * 24;
         return `${x},${y}`;
       })
       .join(" ");
+  }
+
+  function getTrendColor(direction: TickerListEntry["trendDirection"]): string {
+    if (direction === "up") {
+      return positiveTrendColor;
+    }
+
+    if (direction === "down") {
+      return negativeTrendColor;
+    }
+
+    return flatTrendColor;
   }
 </script>
 
@@ -52,7 +71,7 @@
     <span>Name</span>
     <span>Last</span>
     <span>Change</span>
-    <span>Trend</span>
+    <span>{trendLabel}</span>
   </div>
 
   {#if entries.length > 0}
@@ -76,7 +95,11 @@
           <p class="text-sm font-medium">{formatPrice(entry.lastClose)}</p>
           <p
             class={`text-sm font-medium ${
-              (entry.lastChange ?? 0) >= 0 ? "text-emerald-700" : "text-rose-600"
+              entry.trendDirection === "up"
+                ? "text-emerald-700"
+                : entry.trendDirection === "down"
+                  ? "text-rose-600"
+                  : "text-slate-500"
             }`}
           >
             {formatChange(entry.lastChange)}
@@ -87,7 +110,7 @@
                 <polyline
                   fill="none"
                   points={buildSparkline(entry.trendPoints)}
-                  stroke={(entry.lastChange ?? 0) >= 0 ? "#0f766e" : "#dc2626"}
+                  stroke={getTrendColor(entry.trendDirection)}
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
