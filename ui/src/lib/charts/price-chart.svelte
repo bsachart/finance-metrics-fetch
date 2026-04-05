@@ -2,6 +2,7 @@
   import {
     CandlestickSeries,
     HistogramSeries,
+    LineSeries,
     createChart,
     type IChartApi,
     type ISeriesApi,
@@ -11,17 +12,22 @@
   import {
     buildCandlestickSeries,
     buildNormalizedQuoteVolumeSeries,
+    buildPriceSeries,
     formatVolumeAxisValue,
     getVolumeScale,
   } from "$data/market";
   import type { MarketPoint } from "$data/types";
 
   export let points: MarketPoint[] = [];
+  export let showVix = false;
+  export let vixLabel = "VIX";
+  export let vixPoints: MarketPoint[] = [];
 
   let host: HTMLDivElement;
   let chart: IChartApi | null = null;
   let priceSeries: ISeriesApi<"Candlestick"> | null = null;
   let volumeSeries: ISeriesApi<"Histogram"> | null = null;
+  let vixSeries: ISeriesApi<"Line"> | null = null;
 
   function setupChart(): void {
     if (!host) {
@@ -39,6 +45,10 @@
         attributionLogo: false,
         background: { color: "transparent" },
         textColor: "#13212f",
+      },
+      leftPriceScale: {
+        borderVisible: false,
+        visible: showVix && vixPoints.length > 0,
       },
       rightPriceScale: {
         borderVisible: false,
@@ -75,6 +85,22 @@
       1,
     );
 
+    vixSeries = chart.addSeries(
+      LineSeries,
+      {
+        color: "#7c5cff",
+        crosshairMarkerBorderColor: "#7c5cff",
+        crosshairMarkerBackgroundColor: "#ffffff",
+        crosshairMarkerRadius: 4,
+        lastValueVisible: showVix,
+        lineWidth: 2,
+        priceLineVisible: false,
+        priceScaleId: "left",
+        title: vixLabel,
+      },
+      0,
+    );
+
     const panes = chart.panes();
     panes[0]?.setStretchFactor(0.7);
     panes[1]?.setStretchFactor(0.3);
@@ -83,11 +109,12 @@
   }
 
   function syncSeries(): void {
-    if (!chart || !priceSeries || !volumeSeries) {
+    if (!chart || !priceSeries || !volumeSeries || !vixSeries) {
       return;
     }
 
     const volumeScale = getVolumeScale(points);
+    const hasVix = showVix && vixPoints.length > 0;
 
     priceSeries.setData(buildCandlestickSeries(points));
     volumeSeries.applyOptions({
@@ -98,13 +125,27 @@
       },
     });
     volumeSeries.setData(buildNormalizedQuoteVolumeSeries(points, volumeScale));
+    vixSeries.applyOptions({
+      lastValueVisible: hasVix,
+      title: vixLabel,
+      visible: hasVix,
+    });
+    vixSeries.setData(hasVix ? buildPriceSeries(vixPoints) : []);
+    chart.applyOptions({
+      leftPriceScale: {
+        borderVisible: false,
+        visible: hasVix,
+      },
+    });
     chart.timeScale().fitContent();
   }
 
   onMount(setupChart);
 
-  $: if (chart && priceSeries && volumeSeries) {
+  $: if (chart && priceSeries && volumeSeries && vixSeries) {
     points;
+    vixPoints;
+    showVix;
     syncSeries();
   }
 
@@ -113,6 +154,7 @@
     chart = null;
     priceSeries = null;
     volumeSeries = null;
+    vixSeries = null;
   });
 </script>
 
@@ -120,7 +162,7 @@
 
 <style>
   .chart-root {
-    height: 560px;
+    height: 520px;
     width: 100%;
   }
 </style>

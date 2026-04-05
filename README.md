@@ -73,10 +73,12 @@ npm run build
 The dashboard provides:
 
 - symbol and index discovery from packaged published assets
+- a compact ticker-first layout with the main chart at the top of the ticker workflow
 - one combined OHLC and dollar-volume chart with compact volume units
+- VIX shown on the market chart by default with a simple hide toggle
 - lookback presets such as `1W`, `1M`, `YTD`, `1Y`, and `5Y`
 - bar aggregation controls for `1D`, `1W`, and `1M`, defaulting to `1M` lookback and daily bars
-- a separate indices tab for constituent browsing
+- separate `Tickers` and `Market Constituents` views
 - dated constituent history files in the repository instead of per-row fetch timestamps
 
 ## GitHub Actions Schedule
@@ -89,12 +91,18 @@ to refresh market and constituent data on GitHub Actions.
 - manual trigger: available through `workflow_dispatch`
 - daily alternative: already commented in the workflow file if you want to
   switch from every 2 hours to once per day
+- uses current GitHub Actions majors compatible with the Node 24 migration
 
 ## GitHub Pages
 
 The repository also includes
 [`deploy-ui.yml`](/home/bog/Documents/finance_metrics_fetch/.github/workflows/deploy-ui.yml)
 to build and deploy the static `ui/` app to GitHub Pages from `main`.
+
+- Pages is configured to deploy with GitHub Actions workflow builds
+- the workflow publishes the built `ui/build` artifact
+- the workflow opts into the Node 24 JavaScript action runtime during the
+  migration window
 
 ## Working Style
 

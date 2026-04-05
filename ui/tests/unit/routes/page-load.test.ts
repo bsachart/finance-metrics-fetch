@@ -58,11 +58,13 @@ describe("page load", () => {
     });
 
     const result = (await load({ fetch: fetchFn } as never)) as {
-      dashboard: { status: { status: string } };
+      dashboard: { indexOptions: Array<{ key: string }>; status: { status: string }; vixSymbol: string | null };
       defaultSymbol: string;
     };
 
     expect(result.defaultSymbol).toBe("VOO");
+    expect(result.dashboard.vixSymbol).toBe("^VIX");
+    expect(result.dashboard.indexOptions.map((option) => option.key)).toEqual(["sp500", "nasdaq100"]);
     expect(result.dashboard.status.status).toBe("success");
   });
 });

@@ -5,15 +5,7 @@ import type {
   LineData,
 } from "lightweight-charts";
 
-import type { MarketPoint, SummaryMetric } from "./types";
-
-export interface MarketSummary {
-  latestClose: number;
-  latestDollarVolume: number;
-  averageDollarVolume: number;
-  totalTradingDays: number;
-  latestDate: string;
-}
+import type { MarketPoint } from "./types";
 
 export interface VolumeScale {
   divisor: number;
@@ -144,79 +136,24 @@ export function buildNormalizedQuoteVolumeSeries(
   }));
 }
 
-export function summarizeMarket(points: MarketPoint[]): MarketSummary | null {
-  if (points.length === 0) {
-    return null;
-  }
-
-  const sorted = sortMarketPoints(points);
-  const latest = sorted.at(-1);
-
-  if (!latest) {
-    return null;
-  }
-
-  const totalDollarVolume = sorted.reduce(
-    (runningTotal, point) => runningTotal + point.quote_volume,
-    0,
-  );
-
-  return {
-    averageDollarVolume: totalDollarVolume / sorted.length,
-    latestClose: latest.close,
-    latestDate: latest.date,
-    latestDollarVolume: latest.quote_volume,
-    totalTradingDays: sorted.length,
-  };
-}
-
-function formatCompactNumber(value: number): string {
-  return new Intl.NumberFormat("en-US", {
-    maximumFractionDigits: 1,
-    notation: "compact",
-  }).format(value);
-}
-
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat("en-US", {
-    currency: "USD",
-    maximumFractionDigits: value >= 1000 ? 0 : 2,
-    style: "currency",
-  }).format(value);
-}
-
-export function buildSummaryMetrics(points: MarketPoint[]): SummaryMetric[] {
-  const summary = summarizeMarket(points);
-
-  if (!summary) {
-    return [];
-  }
-
-  return [
-    {
-      label: "Last close",
-      tone: "accent",
-      value: formatCurrency(summary.latestClose),
-    },
-    {
-      label: "Last dollar volume",
-      value: formatCompactNumber(summary.latestDollarVolume),
-    },
-    {
-      label: "Average dollar volume",
-      value: formatCompactNumber(summary.averageDollarVolume),
-    },
-    {
-      label: "Bars",
-      tone: "warm",
-      value: summary.totalTradingDays.toLocaleString("en-US"),
-    },
-  ];
-}
-
 export function formatVolumeAxisValue(value: number, scale: VolumeScale): string {
   const suffix = scale.suffix ? ` ${scale.suffix}` : "";
   return `${trimTrailingZeros(value)}${suffix}`;
+}
+
+export function shouldDisplayVixOverlay(
+  selectedSymbol: string | null,
+  vixSymbol: string | null,
+  showVix: boolean,
+  vixPoints: MarketPoint[],
+): boolean {
+  return Boolean(
+    selectedSymbol &&
+      vixSymbol &&
+      selectedSymbol !== vixSymbol &&
+      showVix &&
+      vixPoints.length > 0,
+  );
 }
 
 function trimTrailingZeros(value: number): string {

@@ -21,10 +21,9 @@
 <section class="rounded-[24px] border bg-card/80 p-5 shadow-sm">
   <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
     <div>
-      <h3 class="font-heading text-3xl font-semibold tracking-tight">{indexLabel}</h3>
-      <p class="mt-2 text-muted-foreground">
-        Latest published constituents from the repository data, with dated daily
-        snapshots retained in history files.
+      <h3 class="font-heading text-2xl font-semibold tracking-tight">{indexLabel}</h3>
+      <p class="mt-2 text-sm text-muted-foreground">
+        Latest published constituents from the repository snapshot.
       </p>
     </div>
     <div class="w-full md:max-w-sm">

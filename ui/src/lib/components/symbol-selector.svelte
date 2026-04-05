@@ -11,13 +11,13 @@
   {#each options.filter((option) => option.hasMarketData) as option}
     <button
       class={cn(
-        "rounded-[24px] border bg-card/80 p-4 text-left transition hover:border-ring/40 hover:bg-card",
+        "rounded-[20px] border bg-background/70 p-3 text-left transition hover:border-ring/40 hover:bg-card",
         option.symbol === selectedSymbol && "border-ring bg-accent/60 shadow-sm",
       )}
       on:click={() => (selectedSymbol = option.symbol)}
       type="button"
     >
-      <span class="font-heading block text-3xl font-semibold tracking-tight">{option.symbol}</span>
+      <span class="font-heading block text-2xl font-semibold tracking-tight">{option.symbol}</span>
       <small class="mt-1 block text-sm text-muted-foreground">{option.label}</small>
     </button>
   {/each}

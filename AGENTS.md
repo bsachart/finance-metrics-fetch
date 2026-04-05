@@ -9,6 +9,8 @@ Auto-generated from all feature plans. Last updated: 2026-04-05
 - Versioned plain files in repository directories (JSON and CSV) (001-config-market-fetch)
 - TypeScript 5.x and Svelte 5 for the static UI, Python 3.12 for published data generation + SvelteKit, `@sveltejs/adapter-static`, Lightweight Charts, Papa Parse, Polars (003-simplify-market-ui)
 - Versioned repository files under `data/` and `config/tickers.json`, including dated constituent snapshots, copied into `ui/static/published/` during build (003-simplify-market-ui)
+- TypeScript 5.x and Svelte 5 for the static UI, YAML for GitHub Actions workflow updates + SvelteKit, `@sveltejs/adapter-static`, Lightweight Charts, shadcn-svelte tabs/card primitives (004-simplify-chart-layout)
+- Versioned repository files under `data/` and `config/tickers.json`, copied into the static UI at build time (004-simplify-chart-layout)
 
 ## Project Structure
 
@@ -38,9 +40,9 @@ ui/
 Python 3.12 with type hints: Follow standard conventions and keep dataframe work in Polars, not pandas.
 
 ## Recent Changes
+- 004-simplify-chart-layout: Added TypeScript 5.x and Svelte 5 for the static UI, YAML for GitHub Actions workflow updates + SvelteKit, `@sveltejs/adapter-static`, Lightweight Charts, shadcn-svelte tabs/card primitives
 - 003-simplify-market-ui: Added TypeScript 5.x and Svelte 5 for the static UI, Python 3.12 for published data generation + SvelteKit, `@sveltejs/adapter-static`, Lightweight Charts, Papa Parse, Polars
 - 002-market-ui: Added the static `ui/` dashboard, packaged data loading, chart views, histogram views, constituent browsing, and GitHub Pages deployment workflow
-- 001-config-market-fetch: Added the typed Python fetch pipeline, normalized data artifacts, and scheduled refresh automation
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

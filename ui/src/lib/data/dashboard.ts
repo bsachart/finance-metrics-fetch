@@ -51,7 +51,7 @@ export async function loadDashboardData(
     label: ticker.label,
     role: ticker.role,
     hasMarketData: ticker.has_market_data,
-  }));
+  })).sort((left, right) => rankSymbolOption(left) - rankSymbolOption(right));
 
   const enabledIndices = assetManifest.indices.filter((index) => index.enabled);
   const loadedIndices = await Promise.all(
@@ -121,6 +121,10 @@ export async function loadDashboardData(
     },
     warnings,
   };
+}
+
+function rankSymbolOption(option: SymbolOption): number {
+  return option.role === "volatility" || option.symbol === "^VIX" ? 1 : 0;
 }
 
 export function getDefaultSymbol(dashboard: DashboardData): string | null {

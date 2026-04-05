@@ -81,11 +81,7 @@ export interface IndexOption {
   hasConstituents: boolean;
 }
 
-export interface SummaryMetric {
-  label: string;
-  value: string;
-  tone?: "default" | "accent" | "warm" | "danger";
-}
+export type DashboardSection = "tickers" | "constituents";
 
 export interface HistogramBucket {
   start: number;

@@ -7,9 +7,8 @@ import {
   buildNormalizedQuoteVolumeSeries,
   buildPriceSeries,
   filterMarketPointsByLookback,
-  buildSummaryMetrics,
   getVolumeScale,
-  summarizeMarket,
+  shouldDisplayVixOverlay,
 } from "../../../src/lib/data/market";
 
 const points = [
@@ -52,9 +51,10 @@ describe("market helpers", () => {
     expect(buildNormalizedQuoteVolumeSeries(points, getVolumeScale(points))[2]?.value).toBe(255);
   });
 
-  it("summarizes market series into metrics", () => {
-    expect(summarizeMarket(points)?.latestClose).toBe(510);
-    expect(buildSummaryMetrics(points)).toHaveLength(4);
+  it("decides when a VIX overlay should be visible", () => {
+    expect(shouldDisplayVixOverlay("VOO", "^VIX", true, points)).toBe(true);
+    expect(shouldDisplayVixOverlay("VOO", "^VIX", false, points)).toBe(false);
+    expect(shouldDisplayVixOverlay("^VIX", "^VIX", true, points)).toBe(false);
   });
 
   it("filters and aggregates market views", () => {
