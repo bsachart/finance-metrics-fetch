@@ -82,6 +82,9 @@ export async function loadDashboardData(
       }
     }),
   );
+  const orderedIndices = [...loadedIndices].sort(
+    (left, right) => rankIndexOption(left.key) - rankIndexOption(right.key),
+  );
 
   const marketBySymbol = Object.fromEntries(
     loadedSymbols
@@ -109,9 +112,9 @@ export async function loadDashboardData(
   return {
     dashboard: {
       constituentsByIndex: Object.fromEntries(
-        loadedIndices.map((index) => [index.key, index.records]),
+        orderedIndices.map((index) => [index.key, index.records]),
       ),
-      indexOptions: loadedIndices.map((index) => ({
+      indexOptions: orderedIndices.map((index) => ({
         key: index.key,
         label: index.label,
         hasConstituents: index.records.length > 0,
@@ -136,6 +139,18 @@ function rankSymbolOption(option: SymbolOption): number {
   }
 
   return 1;
+}
+
+function rankIndexOption(key: string): number {
+  if (key === "nasdaq100") {
+    return 0;
+  }
+
+  if (key === "sp500") {
+    return 1;
+  }
+
+  return 2;
 }
 
 export function getDefaultSymbol(dashboard: DashboardData): string | null {

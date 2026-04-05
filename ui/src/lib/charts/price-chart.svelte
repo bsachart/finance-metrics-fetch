@@ -91,7 +91,7 @@
         crosshairMarkerBorderColor: "#7c5cff",
         crosshairMarkerBackgroundColor: "#ffffff",
         crosshairMarkerRadius: 4,
-        lastValueVisible: showVix,
+        lastValueVisible: false,
         lineWidth: 2,
         priceLineVisible: false,
         priceScaleId: "left",
@@ -125,7 +125,7 @@
     });
     volumeSeries.setData(buildNormalizedQuoteVolumeSeries(points, volumeScale));
     vixSeries.applyOptions({
-      lastValueVisible: hasVix,
+      lastValueVisible: false,
       title: "",
       visible: hasVix,
     });

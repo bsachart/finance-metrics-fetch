@@ -64,7 +64,10 @@ describe("page load", () => {
 
     expect(result.defaultSymbol).toBe("VOO");
     expect(result.dashboard.vixSymbol).toBe("^VIX");
-    expect(result.dashboard.indexOptions.map((option) => option.key)).toEqual(["sp500", "nasdaq100"]);
+    expect(result.dashboard.indexOptions.map((option) => option.key)).toEqual([
+      "nasdaq100",
+      "sp500",
+    ]);
     expect(result.dashboard.status.status).toBe("success");
   });
 });

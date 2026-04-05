@@ -70,6 +70,10 @@ describe("dashboard data orchestration", () => {
       "MSFT",
       "^VIX",
     ]);
+    expect(payload.dashboard.indexOptions.map((option) => option.key)).toEqual([
+      "nasdaq100",
+      "sp500",
+    ]);
     expect(payload.dashboard.constituentsByIndex.sp500).toHaveLength(1);
     expect(payload.dashboard.indexOptions).toHaveLength(2);
   });

@@ -33,7 +33,7 @@
       "label": "Intel",
       "role": "asset",
       "enabled": true,
-      "has_market_data": false
+      "has_market_data": true
     },
     {
       "symbol": "MSFT",
