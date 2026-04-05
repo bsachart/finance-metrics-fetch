@@ -12,7 +12,7 @@
 <section class="rounded-[24px] border bg-card/80 p-5">
   <Badge variant="outline">Volatility context</Badge>
   {#if symbol && summary}
-    <h3 class="mt-4 text-3xl font-semibold tracking-tight">
+    <h3 class="font-heading mt-4 text-3xl font-semibold tracking-tight">
       {symbol} closed at {summary.latestClose.toFixed(2)}
     </h3>
     <p class="mt-2 text-muted-foreground">
@@ -20,7 +20,7 @@
       context alongside the selected asset.
     </p>
   {:else}
-    <h3 class="mt-4 text-3xl font-semibold tracking-tight">No VIX context available</h3>
+    <h3 class="font-heading mt-4 text-3xl font-semibold tracking-tight">No VIX context available</h3>
     <p class="mt-2 text-muted-foreground">
       The published dataset did not include a usable volatility series.
     </p>

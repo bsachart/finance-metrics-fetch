@@ -17,7 +17,7 @@
       on:click={() => (selectedSymbol = option.symbol)}
       type="button"
     >
-      <span class="block text-3xl font-semibold tracking-tight">{option.symbol}</span>
+      <span class="font-heading block text-3xl font-semibold tracking-tight">{option.symbol}</span>
       <small class="mt-1 block text-sm text-muted-foreground">{option.label}</small>
     </button>
   {/each}

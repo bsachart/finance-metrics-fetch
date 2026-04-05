@@ -67,7 +67,7 @@
 <div class="mx-auto w-[min(1200px,calc(100vw-2rem))] pb-12 pt-5 md:pt-8">
   <header class="space-y-6">
     <Badge variant="outline">Published market dashboard</Badge>
-    <h1 class="max-w-6xl text-6xl font-semibold leading-none tracking-[-0.05em] md:text-8xl">
+    <h1 class="font-heading max-w-6xl text-6xl font-semibold leading-none tracking-[-0.05em] md:text-8xl">
       Market history from the repository, not a live backend.
     </h1>
     <p class="max-w-3xl text-lg leading-8 text-muted-foreground">
@@ -81,8 +81,8 @@
     <StatusCard status={data.dashboard.status} />
 
     {#if data.warnings.length > 0}
-      <Card className="space-y-3">
-        <h2 class="text-2xl font-semibold tracking-tight">Data warnings</h2>
+      <Card class="space-y-3 rounded-[28px] border bg-card/90 p-6 shadow-[0_18px_50px_rgba(18,26,33,0.12)]">
+        <h2 class="font-heading text-2xl font-semibold tracking-tight">Data warnings</h2>
         <ul class="list-disc space-y-1 pl-5 text-muted-foreground">
           {#each data.warnings as warning}
             <li>{warning}</li>
@@ -92,10 +92,10 @@
     {/if}
 
     {#if selectedSymbol}
-      <Card className="space-y-4">
+      <Card class="space-y-4 rounded-[28px] border bg-card/90 p-6 shadow-[0_18px_50px_rgba(18,26,33,0.12)]">
         <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
           <div>
-            <h2 class="text-3xl font-semibold tracking-tight">Published symbols</h2>
+            <h2 class="font-heading text-3xl font-semibold tracking-tight">Published symbols</h2>
             <p class="mt-2 text-muted-foreground">
               Symbol switches are local UI updates because the dashboard loads the packaged
               repository datasets up front.
@@ -110,17 +110,17 @@
 
       <div class="flex flex-wrap gap-3">
         <Button
-          on:click={() => (activePanel = "market")}
+          onclick={() => (activePanel = "market")}
           type="button"
           variant={activePanel === "market" ? "default" : "outline"}>Market view</Button
         >
         <Button
-          on:click={() => (activePanel = "distribution")}
+          onclick={() => (activePanel = "distribution")}
           type="button"
           variant={activePanel === "distribution" ? "default" : "outline"}>Distributions</Button
         >
         <Button
-          on:click={() => (activePanel = "constituents")}
+          onclick={() => (activePanel = "constituents")}
           type="button"
           variant={activePanel === "constituents" ? "default" : "outline"}>Constituents</Button
         >
@@ -130,10 +130,10 @@
         <section class="grid gap-4">
           <MarketSummary metrics={summaryMetrics} />
           <VixContext points={vixPoints} symbol={data.dashboard.vixSymbol} />
-          <Card className="space-y-4">
+          <Card class="space-y-4 rounded-[28px] border bg-card/90 p-6 shadow-[0_18px_50px_rgba(18,26,33,0.12)]">
             <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
               <div>
-                <h2 class="text-3xl font-semibold tracking-tight">
+                <h2 class="font-heading text-3xl font-semibold tracking-tight">
                   {selectedSymbol} price with VIX context
                 </h2>
                 <p class="mt-2 text-muted-foreground">
@@ -144,10 +144,10 @@
             </div>
             <PriceChart overlayPoints={vixPoints} points={marketPoints} />
           </Card>
-          <Card className="space-y-4">
+          <Card class="space-y-4 rounded-[28px] border bg-card/90 p-6 shadow-[0_18px_50px_rgba(18,26,33,0.12)]">
             <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
               <div>
-                <h2 class="text-3xl font-semibold tracking-tight">Nominal quote volume</h2>
+                <h2 class="font-heading text-3xl font-semibold tracking-tight">Nominal quote volume</h2>
                 <p class="mt-2 text-muted-foreground">
                   Repository-published `quote_volume` derived from close multiplied by share
                   volume.
@@ -163,12 +163,12 @@
         <section class="grid gap-4">
           <div class="flex flex-wrap gap-3">
             <Button
-              on:click={() => (selectedIndex = "sp500")}
+              onclick={() => (selectedIndex = "sp500")}
               type="button"
               variant={selectedIndex === "sp500" ? "default" : "outline"}>S&amp;P 500</Button
             >
             <Button
-              on:click={() => (selectedIndex = "nasdaq100")}
+              onclick={() => (selectedIndex = "nasdaq100")}
               type="button"
               variant={selectedIndex === "nasdaq100" ? "default" : "outline"}>Nasdaq-100</Button
             >
