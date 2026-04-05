@@ -1,5 +1,13 @@
 <script lang="ts">
   import { Input } from "$lib/components/ui/input";
+  import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+  } from "$lib/components/ui/table";
   import { filterConstituents } from "$data/constituents";
   import type { ConstituentRecord } from "$data/types";
 
@@ -24,25 +32,25 @@
   </div>
 
   <div class="mt-5 overflow-auto rounded-[20px] border bg-background/70">
-    <table class="w-full border-collapse">
-      <thead>
-        <tr>
-          <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Symbol</th>
-          <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Name</th>
-          <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Sector</th>
-          <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Sub-industry</th>
-        </tr>
-      </thead>
-      <tbody>
+    <Table class="min-w-full text-sm">
+      <TableHeader>
+        <TableRow>
+          <TableHead class="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Symbol</TableHead>
+          <TableHead class="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Name</TableHead>
+          <TableHead class="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Sector</TableHead>
+          <TableHead class="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Sub-industry</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
         {#each filteredRecords.slice(0, 120) as record}
-          <tr class="border-t">
-            <td class="px-4 py-3 font-medium">{record.symbol}</td>
-            <td class="px-4 py-3">{record.name}</td>
-            <td class="px-4 py-3 text-muted-foreground">{record.sector}</td>
-            <td class="px-4 py-3 text-muted-foreground">{record.sub_industry}</td>
-          </tr>
+          <TableRow>
+            <TableCell class="px-4 py-3 font-medium">{record.symbol}</TableCell>
+            <TableCell class="px-4 py-3">{record.name}</TableCell>
+            <TableCell class="px-4 py-3 text-muted-foreground">{record.sector}</TableCell>
+            <TableCell class="px-4 py-3 text-muted-foreground">{record.sub_industry}</TableCell>
+          </TableRow>
         {/each}
-      </tbody>
-    </table>
+      </TableBody>
+    </Table>
   </div>
 </section>

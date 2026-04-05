@@ -10,9 +10,14 @@
   import SymbolSelector from "$components/symbol-selector.svelte";
   import VixContext from "$components/vix-context.svelte";
   import { buildSummaryMetrics } from "$data/market";
+  import {
+    Alert,
+    AlertDescription,
+    AlertTitle,
+  } from "$lib/components/ui/alert";
   import { Badge } from "$lib/components/ui/badge";
-  import { Button } from "$lib/components/ui/button";
   import { Card } from "$lib/components/ui/card";
+  import { Tabs, TabsContent, TabsList, TabsTrigger } from "$lib/components/ui/tabs";
   import { onMount } from "svelte";
 
   import type { PageData } from "./$types";
@@ -81,14 +86,18 @@
     <StatusCard status={data.dashboard.status} />
 
     {#if data.warnings.length > 0}
-      <Card class="space-y-3 rounded-[28px] border bg-card/90 p-6 shadow-[0_18px_50px_rgba(18,26,33,0.12)]">
-        <h2 class="font-heading text-2xl font-semibold tracking-tight">Data warnings</h2>
-        <ul class="list-disc space-y-1 pl-5 text-muted-foreground">
-          {#each data.warnings as warning}
-            <li>{warning}</li>
-          {/each}
-        </ul>
-      </Card>
+      <Alert class="rounded-[28px] border bg-card/90 p-6 shadow-[0_18px_50px_rgba(18,26,33,0.12)]">
+        <AlertTitle class="font-heading text-2xl font-semibold tracking-tight">
+          Data warnings
+        </AlertTitle>
+        <AlertDescription>
+          <ul class="mt-3 list-disc space-y-1 pl-5 text-muted-foreground">
+            {#each data.warnings as warning}
+              <li>{warning}</li>
+            {/each}
+          </ul>
+        </AlertDescription>
+      </Alert>
     {/if}
 
     {#if selectedSymbol}
@@ -108,26 +117,14 @@
         />
       </Card>
 
-      <div class="flex flex-wrap gap-3">
-        <Button
-          onclick={() => (activePanel = "market")}
-          type="button"
-          variant={activePanel === "market" ? "default" : "outline"}>Market view</Button
-        >
-        <Button
-          onclick={() => (activePanel = "distribution")}
-          type="button"
-          variant={activePanel === "distribution" ? "default" : "outline"}>Distributions</Button
-        >
-        <Button
-          onclick={() => (activePanel = "constituents")}
-          type="button"
-          variant={activePanel === "constituents" ? "default" : "outline"}>Constituents</Button
-        >
-      </div>
+      <Tabs bind:value={activePanel} class="gap-4">
+        <TabsList class="rounded-full p-1" variant="default">
+          <TabsTrigger class="rounded-full px-4 text-sm" value="market">Market view</TabsTrigger>
+          <TabsTrigger class="rounded-full px-4 text-sm" value="distribution">Distributions</TabsTrigger>
+          <TabsTrigger class="rounded-full px-4 text-sm" value="constituents">Constituents</TabsTrigger>
+        </TabsList>
 
-      {#if activePanel === "market"}
-        <section class="grid gap-4">
+        <TabsContent class="mt-0 grid gap-4" value="market">
           <MarketSummary metrics={summaryMetrics} />
           <VixContext points={vixPoints} symbol={data.dashboard.vixSymbol} />
           <Card class="space-y-4 rounded-[28px] border bg-card/90 p-6 shadow-[0_18px_50px_rgba(18,26,33,0.12)]">
@@ -156,29 +153,26 @@
             </div>
             <VolumeChart points={marketPoints} />
           </Card>
-        </section>
-      {:else if activePanel === "distribution"}
-        <DistributionPanel points={marketPoints} />
-      {:else}
-        <section class="grid gap-4">
-          <div class="flex flex-wrap gap-3">
-            <Button
-              onclick={() => (selectedIndex = "sp500")}
-              type="button"
-              variant={selectedIndex === "sp500" ? "default" : "outline"}>S&amp;P 500</Button
-            >
-            <Button
-              onclick={() => (selectedIndex = "nasdaq100")}
-              type="button"
-              variant={selectedIndex === "nasdaq100" ? "default" : "outline"}>Nasdaq-100</Button
-            >
-          </div>
+        </TabsContent>
+
+        <TabsContent class="mt-0" value="distribution">
+          <DistributionPanel points={marketPoints} />
+        </TabsContent>
+
+        <TabsContent class="mt-0 grid gap-4" value="constituents">
+          <Tabs bind:value={selectedIndex} class="gap-4">
+            <TabsList class="rounded-full p-1" variant="default">
+              <TabsTrigger class="rounded-full px-4 text-sm" value="sp500">S&amp;P 500</TabsTrigger>
+              <TabsTrigger class="rounded-full px-4 text-sm" value="nasdaq100">Nasdaq-100</TabsTrigger>
+            </TabsList>
+
           <ConstituentTable
             indexLabel={selectedIndex === "sp500" ? "S&P 500" : "Nasdaq-100"}
             records={data.dashboard.constituentsByIndex[selectedIndex]}
           />
-        </section>
-      {/if}
+          </Tabs>
+        </TabsContent>
+      </Tabs>
     {:else}
       <EmptyState
         message="The static site could not find a usable market dataset in the published artifacts."

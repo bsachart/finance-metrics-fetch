@@ -33,6 +33,8 @@
   "devDependencies": {
     "@fontsource-variable/ibm-plex-sans": "^5.2.8",
     "@fontsource-variable/manrope": "^5.2.8",
+    "@internationalized/date": "^3.12.0",
+    "bits-ui": "^2.17.2",
     "clsx": "^2.1.1",
     "remixicon-svelte": "^0.0.5",
     "shadcn-svelte": "^1.2.7",
