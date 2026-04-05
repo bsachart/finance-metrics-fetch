@@ -42,6 +42,28 @@ def test_normalize_market_history_adds_symbol_and_quote_volume() -> None:
     assert normalized["quote_volume"].to_list() == [1005.0, 2040.0]
 
 
+def test_normalize_market_history_rounds_prices_and_dollar_volume() -> None:
+    """Market normalization should clamp float precision before persistence."""
+    frame = pl.DataFrame(
+        {
+            "date": [date(2026, 4, 1)],
+            "open": [100.12349],
+            "high": [101.98764],
+            "low": [99.11119],
+            "close": [100.55551],
+            "volume": [11],
+        }
+    )
+
+    normalized = normalize_market_history("intc", frame)
+
+    assert normalized["open"].to_list() == [100.123]
+    assert normalized["high"].to_list() == [101.988]
+    assert normalized["low"].to_list() == [99.111]
+    assert normalized["close"].to_list() == [100.556]
+    assert normalized["quote_volume"].to_list() == [1106.12]
+
+
 def test_normalize_constituents_and_json_records() -> None:
     """Constituent normalization should trim values and produce JSON-safe rows."""
     frame = pl.DataFrame(

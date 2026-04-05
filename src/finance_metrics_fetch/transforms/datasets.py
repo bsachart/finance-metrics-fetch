@@ -6,6 +6,9 @@ from datetime import date, datetime
 
 import polars as pl
 
+PRICE_DECIMALS = 3
+DOLLAR_VOLUME_DECIMALS = 2
+
 
 def normalize_market_history(symbol: str, frame: pl.DataFrame) -> pl.DataFrame:
     """Normalize Yahoo-style OHLCV data into the project schema."""
@@ -19,14 +22,18 @@ def normalize_market_history(symbol: str, frame: pl.DataFrame) -> pl.DataFrame:
         frame.select(
             pl.col("date").alias("date"),
             pl.lit(symbol.upper()).alias("symbol"),
-            pl.col("open").cast(pl.Float64),
-            pl.col("high").cast(pl.Float64),
-            pl.col("low").cast(pl.Float64),
-            pl.col("close").cast(pl.Float64),
+            pl.col("open").cast(pl.Float64).round(PRICE_DECIMALS),
+            pl.col("high").cast(pl.Float64).round(PRICE_DECIMALS),
+            pl.col("low").cast(pl.Float64).round(PRICE_DECIMALS),
+            pl.col("close").cast(pl.Float64).round(PRICE_DECIMALS),
             pl.col("volume").cast(pl.Int64),
         )
         .with_columns(
-            quote_volume=(pl.col("close") * pl.col("volume")).cast(pl.Float64)
+            quote_volume=(
+                (pl.col("close") * pl.col("volume"))
+                .cast(pl.Float64)
+                .round(DOLLAR_VOLUME_DECIMALS)
+            )
         )
         .sort("date")
         .unique(subset=["symbol", "date"], keep="last", maintain_order=True)
