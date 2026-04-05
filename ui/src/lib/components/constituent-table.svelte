@@ -23,7 +23,8 @@
     <div>
       <h3 class="font-heading text-3xl font-semibold tracking-tight">{indexLabel}</h3>
       <p class="mt-2 text-muted-foreground">
-        Published constituents packaged from the repository data.
+        Latest published constituents from the repository data, with dated daily
+        snapshots retained in history files.
       </p>
     </div>
     <div class="w-full md:max-w-sm">

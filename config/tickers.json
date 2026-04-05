@@ -42,5 +42,19 @@
       "role": "asset",
       "source": "yahoo_finance"
     }
+  ],
+  "indices": [
+    {
+      "key": "sp500",
+      "label": "S&P 500",
+      "enabled": true,
+      "source": "wikipedia"
+    },
+    {
+      "key": "nasdaq100",
+      "label": "Nasdaq-100",
+      "enabled": true,
+      "source": "wikipedia"
+    }
   ]
 }

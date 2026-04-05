@@ -7,7 +7,6 @@ describe("constituent filters", () => {
     const filtered = filterConstituents(
       [
         {
-          fetched_at: "2026-04-05T00:00:00Z",
           index_name: "sp500",
           name: "Apple Inc.",
           sector: "Information Technology",
@@ -16,7 +15,6 @@ describe("constituent filters", () => {
           symbol: "AAPL",
         },
         {
-          fetched_at: "2026-04-05T00:00:00Z",
           index_name: "sp500",
           name: "Bank Corp",
           sector: "Financials",

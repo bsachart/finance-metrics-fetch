@@ -6,8 +6,36 @@ export interface PublishedTicker {
   source: string;
 }
 
+export interface PublishedIndexConfig {
+  key: string;
+  label: string;
+  enabled: boolean;
+  source: string;
+}
+
 export interface TickerConfig {
   tickers: PublishedTicker[];
+  indices: PublishedIndexConfig[];
+}
+
+export interface PublishedSymbolAsset {
+  symbol: string;
+  label: string;
+  role: string;
+  enabled: boolean;
+  has_market_data: boolean;
+}
+
+export interface PublishedIndexAsset {
+  key: string;
+  label: string;
+  enabled: boolean;
+  has_constituents: boolean;
+}
+
+export interface AssetManifest {
+  symbols: PublishedSymbolAsset[];
+  indices: PublishedIndexAsset[];
 }
 
 export interface PublishedStatus {
@@ -38,7 +66,6 @@ export interface ConstituentRecord {
   sector: string;
   sub_industry: string;
   source_url: string;
-  fetched_at: string;
 }
 
 export interface SymbolOption {
@@ -46,6 +73,12 @@ export interface SymbolOption {
   label: string;
   role: string;
   hasMarketData: boolean;
+}
+
+export interface IndexOption {
+  key: string;
+  label: string;
+  hasConstituents: boolean;
 }
 
 export interface SummaryMetric {
@@ -63,6 +96,7 @@ export interface HistogramBucket {
 export interface DashboardData {
   status: PublishedStatus;
   symbolOptions: SymbolOption[];
+  indexOptions: IndexOption[];
   marketBySymbol: Record<string, MarketPoint[]>;
   vixSymbol: string | null;
   constituentsByIndex: Record<string, ConstituentRecord[]>;

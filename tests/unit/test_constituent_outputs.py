@@ -17,7 +17,6 @@ def test_constituent_normalization_produces_expected_schema() -> None:
             "sector": ["Information Technology"],
             "sub_industry": ["Systems Software"],
             "source_url": ["https://example.com"],
-            "fetched_at": ["2026-04-05T00:00:00+00:00"],
         }
     )
 

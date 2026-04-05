@@ -1,0 +1,60 @@
+{
+  "indices": [
+    {
+      "key": "nasdaq100",
+      "label": "Nasdaq-100",
+      "enabled": true,
+      "has_constituents": true
+    },
+    {
+      "key": "sp500",
+      "label": "S&P 500",
+      "enabled": true,
+      "has_constituents": true
+    }
+  ],
+  "symbols": [
+    {
+      "symbol": "^VIX",
+      "label": "CBOE Volatility Index",
+      "role": "volatility",
+      "enabled": true,
+      "has_market_data": true
+    },
+    {
+      "symbol": "GOOGL",
+      "label": "Alphabet Class A",
+      "role": "asset",
+      "enabled": true,
+      "has_market_data": true
+    },
+    {
+      "symbol": "INTC",
+      "label": "Intel",
+      "role": "asset",
+      "enabled": true,
+      "has_market_data": false
+    },
+    {
+      "symbol": "MSFT",
+      "label": "Microsoft",
+      "role": "asset",
+      "enabled": true,
+      "has_market_data": true
+    },
+    {
+      "symbol": "VIRT",
+      "label": "Virtu Financial",
+      "role": "asset",
+      "enabled": true,
+      "has_market_data": true
+    },
+    {
+      "symbol": "VOO",
+      "label": "Vanguard S&P 500 ETF",
+      "role": "benchmark",
+      "enabled": true,
+      "has_market_data": true
+    }
+  ]
+}

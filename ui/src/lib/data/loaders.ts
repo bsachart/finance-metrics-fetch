@@ -2,6 +2,7 @@ import { base } from "$app/paths";
 import Papa from "papaparse";
 
 import type {
+  AssetManifest,
   ConstituentRecord,
   MarketPoint,
   PublishedStatus,
@@ -23,6 +24,14 @@ export async function loadTickerConfig(fetchFn: typeof fetch): Promise<TickerCon
     throw new Error("Unable to load ticker configuration.");
   }
   return (await response.json()) as TickerConfig;
+}
+
+export async function loadAssetManifest(fetchFn: typeof fetch): Promise<AssetManifest> {
+  const response = await fetchFn(withBase("/published/asset-manifest.json"));
+  if (!response.ok) {
+    throw new Error("Unable to load published asset manifest.");
+  }
+  return (await response.json()) as AssetManifest;
 }
 
 export async function loadStatus(fetchFn: typeof fetch): Promise<PublishedStatus> {
@@ -64,7 +73,7 @@ export async function loadMarketCsv(
 
 export async function loadConstituentCsv(
   fetchFn: typeof fetch,
-  indexName: "sp500" | "nasdaq100",
+  indexName: string,
 ): Promise<ConstituentRecord[]> {
   const response = await fetchFn(
     withBase(`/published/data/constituents/${indexName}.csv`),
@@ -86,6 +95,5 @@ export async function loadConstituentCsv(
     sector: row.sector ?? "",
     sub_industry: row.sub_industry ?? "",
     source_url: row.source_url ?? "",
-    fetched_at: row.fetched_at ?? "",
   }));
 }

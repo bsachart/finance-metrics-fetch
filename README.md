@@ -10,7 +10,7 @@ artifacts for GitHub Pages.
 
 - Extract OHLCV history from Yahoo Finance for configured tickers such as
   `VOO` and `^VIX`
-- Derive and store nominal volume (`close * volume`) alongside OHLCV data
+- Derive and store dollar volume (`close * volume`) alongside OHLCV data
 - Extract S&P 500 and Nasdaq-100 ticker lists from Wikipedia
 - Persist fetched datasets to repository-friendly files such as CSV and JSON
 - Run scheduled and manual fetch workflows from GitHub Actions
@@ -39,9 +39,10 @@ uv run python -m finance_metrics_fetch.cli refresh --config config/tickers.json
 
 Current refresh outputs:
 
-- `data/market/<SYMBOL>.csv` for normalized OHLCV plus quote volume
+- `data/market/<SYMBOL>.csv` for normalized OHLCV plus dollar-volume data
 - `data/constituents/sp500.csv` for S&P 500 constituents
 - `data/constituents/nasdaq100.csv` for Nasdaq-100 constituents
+- `data/constituents/history/<INDEX>/<YYYY-MM-DD>.csv` for dated constituent snapshots
 - `data/status/latest.json` for the latest refresh summary
 
 Constituent CSV schema:
@@ -52,7 +53,6 @@ Constituent CSV schema:
 - `sector`
 - `sub_industry`
 - `source_url`
-- `fetched_at`
 
 ## UI Workflow
 
@@ -72,11 +72,12 @@ npm run build
 
 The dashboard provides:
 
-- symbol selection from the published ticker config
-- price history with VIX context
-- quote-volume history
-- histogram-style price and quote-volume views
-- constituent browsing for S&P 500 and Nasdaq-100
+- symbol and index discovery from packaged published assets
+- one combined OHLC and dollar-volume chart with compact volume units
+- lookback presets such as `1W`, `1M`, `YTD`, `1Y`, and `5Y`
+- bar aggregation controls for `1D`, `1W`, and `1M`, defaulting to `1M` lookback and daily bars
+- a separate indices tab for constituent browsing
+- dated constituent history files in the repository instead of per-row fetch timestamps
 
 ## GitHub Actions Schedule
 

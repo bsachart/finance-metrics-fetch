@@ -1,22 +1,27 @@
 <script lang="ts">
   import {
+    CandlestickSeries,
+    HistogramSeries,
     createChart,
-    LineSeries,
     type IChartApi,
     type ISeriesApi,
   } from "lightweight-charts";
   import { onDestroy, onMount } from "svelte";
 
-  import { buildPriceSeries } from "$data/market";
+  import {
+    buildCandlestickSeries,
+    buildNormalizedQuoteVolumeSeries,
+    formatVolumeAxisValue,
+    getVolumeScale,
+  } from "$data/market";
   import type { MarketPoint } from "$data/types";
 
   export let points: MarketPoint[] = [];
-  export let overlayPoints: MarketPoint[] = [];
 
   let host: HTMLDivElement;
   let chart: IChartApi | null = null;
-  let priceSeries: ISeriesApi<"Line"> | null = null;
-  let vixSeries: ISeriesApi<"Line"> | null = null;
+  let priceSeries: ISeriesApi<"Candlestick"> | null = null;
+  let volumeSeries: ISeriesApi<"Histogram"> | null = null;
 
   function setupChart(): void {
     if (!host) {
@@ -27,6 +32,9 @@
 
     chart = createChart(host, {
       autoSize: true,
+      crosshair: {
+        mode: 3,
+      },
       layout: {
         attributionLogo: false,
         background: { color: "transparent" },
@@ -40,39 +48,63 @@
       },
     });
 
-    priceSeries = chart.addSeries(LineSeries, {
-      color: "#0f766e",
-      lineWidth: 2,
-      title: "Close",
-    });
-    vixSeries = chart.addSeries(LineSeries, {
-      color: "#bf6b34",
-      lineWidth: 2,
-      priceScaleId: "",
-      title: "VIX",
-    });
+    priceSeries = chart.addSeries(
+      CandlestickSeries,
+      {
+        downColor: "#f43f5e",
+        borderVisible: false,
+        wickDownColor: "#f43f5e",
+        upColor: "#0f766e",
+        wickUpColor: "#0f766e",
+      },
+      0,
+    );
+
+    volumeSeries = chart.addSeries(
+      HistogramSeries,
+      {
+        base: 0,
+        priceFormat: {
+          formatter: (value: number) => formatVolumeAxisValue(value, getVolumeScale(points)),
+          minMove: 0.01,
+          type: "custom",
+        },
+        priceLineVisible: false,
+        title: "Dollar volume",
+      },
+      1,
+    );
+
+    const panes = chart.panes();
+    panes[0]?.setStretchFactor(0.7);
+    panes[1]?.setStretchFactor(0.3);
 
     syncSeries();
-    chart.timeScale().fitContent();
   }
 
   function syncSeries(): void {
-    if (!chart || !priceSeries || !vixSeries) {
+    if (!chart || !priceSeries || !volumeSeries) {
       return;
     }
 
-    priceSeries.setData(buildPriceSeries(points));
-    vixSeries.setData(buildPriceSeries(overlayPoints));
+    const volumeScale = getVolumeScale(points);
+
+    priceSeries.setData(buildCandlestickSeries(points));
+    volumeSeries.applyOptions({
+      priceFormat: {
+        formatter: (value: number) => formatVolumeAxisValue(value, volumeScale),
+        minMove: 0.01,
+        type: "custom",
+      },
+    });
+    volumeSeries.setData(buildNormalizedQuoteVolumeSeries(points, volumeScale));
     chart.timeScale().fitContent();
   }
 
-  onMount(() => {
-    setupChart();
-  });
+  onMount(setupChart);
 
-  $: if (chart && priceSeries && vixSeries) {
+  $: if (chart && priceSeries && volumeSeries) {
     points;
-    overlayPoints;
     syncSeries();
   }
 
@@ -80,7 +112,7 @@
     chart?.remove();
     chart = null;
     priceSeries = null;
-    vixSeries = null;
+    volumeSeries = null;
   });
 </script>
 
@@ -88,7 +120,7 @@
 
 <style>
   .chart-root {
-    height: 360px;
+    height: 560px;
     width: 100%;
   }
 </style>

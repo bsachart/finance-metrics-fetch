@@ -16,6 +16,12 @@ class TickerRole(StrEnum):
     BENCHMARK = "benchmark"
 
 
+class IndexSource(StrEnum):
+    """Supported constituent sources."""
+
+    WIKIPEDIA = "wikipedia"
+
+
 class RefreshStatus(StrEnum):
     """Supported refresh statuses."""
 
@@ -48,7 +54,16 @@ class ConstituentRow:
     sector: str | None
     sub_industry: str | None
     source_url: str
-    fetched_at: str
+
+
+@dataclass(frozen=True, slots=True)
+class IndexConfig:
+    """Index configuration entry."""
+
+    key: str
+    label: str
+    enabled: bool
+    source: IndexSource = IndexSource.WIKIPEDIA
 
 
 @dataclass(frozen=True, slots=True)
@@ -67,6 +82,7 @@ class ConfigDocument:
     """Top-level configuration document."""
 
     tickers: list[TickerConfig]
+    indices: list[IndexConfig]
 
 
 @dataclass(frozen=True, slots=True)

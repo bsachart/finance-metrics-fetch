@@ -1,8 +1,8 @@
 import {
+  loadAssetManifest,
   loadConstituentCsv,
   loadMarketCsv,
   loadStatus,
-  loadTickerConfig,
 } from "./loaders";
 import type { DashboardData, SymbolOption } from "./types";
 
@@ -30,16 +30,15 @@ async function tryLoadMarketSymbol(
 export async function loadDashboardData(
   fetchFn: typeof fetch,
 ): Promise<DashboardPayload> {
-  const [tickerConfig, status, sp500, nasdaq100] = await Promise.all([
-    loadTickerConfig(fetchFn),
+  const [assetManifest, status] = await Promise.all([
+    loadAssetManifest(fetchFn),
     loadStatus(fetchFn),
-    loadConstituentCsv(fetchFn, "sp500"),
-    loadConstituentCsv(fetchFn, "nasdaq100"),
   ]);
 
-  const enabledTickers = tickerConfig.tickers.filter((ticker) => ticker.enabled);
+  const enabledTickers = assetManifest.symbols.filter((ticker) => ticker.enabled);
+  const publishedTickers = enabledTickers.filter((ticker) => ticker.has_market_data);
   const loadedSymbols = await Promise.all(
-    enabledTickers.map(async (ticker) => ({
+    publishedTickers.map(async (ticker) => ({
       symbol: ticker.symbol,
       role: ticker.role,
       label: ticker.label,
@@ -47,12 +46,39 @@ export async function loadDashboardData(
     })),
   );
 
-  const symbolOptions: SymbolOption[] = loadedSymbols.map((entry) => ({
-    symbol: entry.symbol,
-    label: entry.label,
-    role: entry.role,
-    hasMarketData: entry.points.length > 0,
+  const symbolOptions: SymbolOption[] = enabledTickers.map((ticker) => ({
+    symbol: ticker.symbol,
+    label: ticker.label,
+    role: ticker.role,
+    hasMarketData: ticker.has_market_data,
   }));
+
+  const enabledIndices = assetManifest.indices.filter((index) => index.enabled);
+  const loadedIndices = await Promise.all(
+    enabledIndices.map(async (index) => {
+      if (!index.has_constituents) {
+        return {
+          key: index.key,
+          label: index.label,
+          records: [],
+        };
+      }
+
+      try {
+        return {
+          key: index.key,
+          label: index.label,
+          records: await loadConstituentCsv(fetchFn, index.key),
+        };
+      } catch {
+        return {
+          key: index.key,
+          label: index.label,
+          records: [],
+        };
+      }
+    }),
+  );
 
   const marketBySymbol = Object.fromEntries(
     loadedSymbols
@@ -62,6 +88,11 @@ export async function loadDashboardData(
 
   const warnings = loadedSymbols
     .flatMap((entry) => entry.warning ?? [])
+    .concat(
+      enabledTickers
+        .filter((ticker) => !ticker.has_market_data)
+        .map((ticker) => `Published market history is missing for ${ticker.symbol}.`),
+    )
     .concat(
       status.status === "success"
         ? []
@@ -74,10 +105,14 @@ export async function loadDashboardData(
 
   return {
     dashboard: {
-      constituentsByIndex: {
-        nasdaq100,
-        sp500,
-      },
+      constituentsByIndex: Object.fromEntries(
+        loadedIndices.map((index) => [index.key, index.records]),
+      ),
+      indexOptions: loadedIndices.map((index) => ({
+        key: index.key,
+        label: index.label,
+        hasConstituents: index.records.length > 0,
+      })),
       marketBySymbol,
       status,
       symbolOptions,

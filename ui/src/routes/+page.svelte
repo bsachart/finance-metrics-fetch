@@ -1,15 +1,20 @@
 <script lang="ts">
   import { invalidateAll } from "$app/navigation";
   import PriceChart from "$charts/price-chart.svelte";
-  import VolumeChart from "$charts/volume-chart.svelte";
   import ConstituentTable from "$components/constituent-table.svelte";
-  import DistributionPanel from "$components/distribution-panel.svelte";
   import EmptyState from "$components/empty-state.svelte";
   import MarketSummary from "$components/market-summary.svelte";
   import StatusCard from "$components/status-card.svelte";
   import SymbolSelector from "$components/symbol-selector.svelte";
   import VixContext from "$components/vix-context.svelte";
-  import { buildSummaryMetrics } from "$data/market";
+  import {
+    AGGREGATION_PERIODS,
+    LOOKBACK_PRESETS,
+    applyMarketView,
+    buildSummaryMetrics,
+    type AggregationPeriod,
+    type LookbackPreset,
+  } from "$data/market";
   import {
     Alert,
     AlertDescription,
@@ -27,18 +32,35 @@
   const refreshIntervalMs = 60_000;
 
   let selectedSymbol = data.defaultSymbol;
-  let activePanel: "market" | "distribution" | "constituents" = "market";
-  let selectedIndex: "sp500" | "nasdaq100" = "sp500";
+  let activePanel: "market" | "indices" = "market";
+  let selectedIndex = data.dashboard.indexOptions[0]?.key ?? "";
+  let selectedLookback: LookbackPreset = "1M";
+  let selectedAggregation: AggregationPeriod = "1D";
 
-  $: marketPoints = selectedSymbol ? data.dashboard.marketBySymbol[selectedSymbol] ?? [] : [];
-  $: vixPoints =
-    data.dashboard.vixSymbol && data.dashboard.vixSymbol !== selectedSymbol
-      ? data.dashboard.marketBySymbol[data.dashboard.vixSymbol] ?? []
-      : [];
+  $: rawMarketPoints = selectedSymbol ? data.dashboard.marketBySymbol[selectedSymbol] ?? [] : [];
+  $: marketPoints = applyMarketView(rawMarketPoints, selectedLookback, selectedAggregation);
+  $: vixPoints = data.dashboard.vixSymbol
+    ? applyMarketView(
+        data.dashboard.marketBySymbol[data.dashboard.vixSymbol] ?? [],
+        selectedLookback,
+        selectedAggregation,
+      )
+    : [];
   $: summaryMetrics = buildSummaryMetrics(marketPoints);
-  $: availableSymbols = new Set(Object.keys(data.dashboard.marketBySymbol));
+  $: availableSymbols = new Set(
+    data.dashboard.symbolOptions.filter((option) => option.hasMarketData).map((option) => option.symbol),
+  );
   $: if (!selectedSymbol || !availableSymbols.has(selectedSymbol)) {
     selectedSymbol = data.defaultSymbol;
+  }
+  $: availableIndices = new Set(
+    data.dashboard.indexOptions
+      .filter((option) => option.hasConstituents)
+      .map((option) => option.key),
+  );
+  $: if (!selectedIndex || !availableIndices.has(selectedIndex)) {
+    selectedIndex =
+      data.dashboard.indexOptions.find((option) => option.hasConstituents)?.key ?? "";
   }
 
   onMount(() => {
@@ -64,7 +86,7 @@
 <svelte:head>
   <title>Finance Metrics Fetch UI</title>
   <meta
-    content="Static market dashboard for repository-published OHLCV, quote volume, VIX, and constituent datasets."
+    content="Static market dashboard for repository-published OHLC, dollar volume, configurable lookbacks, configurable bar periods, VIX context, and index constituents."
     name="description"
   />
 </svelte:head>
@@ -77,8 +99,8 @@
     </h1>
     <p class="max-w-3xl text-lg leading-8 text-muted-foreground">
       This dashboard reads the published repository data, refreshes it automatically, and
-      lets you inspect price, quote volume, volatility context, and index constituents from
-      the same place.
+      lets you inspect OHLC price action, dollar volume, configurable lookbacks,
+      configurable bar periods, volatility context, and index constituents from the same place.
     </p>
   </header>
 
@@ -106,22 +128,18 @@
           <div>
             <h2 class="font-heading text-3xl font-semibold tracking-tight">Published symbols</h2>
             <p class="mt-2 text-muted-foreground">
-              Symbol switches are local UI updates because the dashboard loads the packaged
-              repository datasets up front.
+              Symbol choices come from the packaged published assets, so the UI only
+              offers symbols that exist in the repository snapshot.
             </p>
           </div>
         </div>
-        <SymbolSelector
-          bind:selectedSymbol
-          options={data.dashboard.symbolOptions}
-        />
+        <SymbolSelector bind:selectedSymbol options={data.dashboard.symbolOptions} />
       </Card>
 
       <Tabs bind:value={activePanel} class="gap-4">
         <TabsList class="rounded-full p-1" variant="default">
-          <TabsTrigger class="rounded-full px-4 text-sm" value="market">Market view</TabsTrigger>
-          <TabsTrigger class="rounded-full px-4 text-sm" value="distribution">Distributions</TabsTrigger>
-          <TabsTrigger class="rounded-full px-4 text-sm" value="constituents">Constituents</TabsTrigger>
+          <TabsTrigger class="rounded-full px-4 text-sm" value="market">Market</TabsTrigger>
+          <TabsTrigger class="rounded-full px-4 text-sm" value="indices">Indices</TabsTrigger>
         </TabsList>
 
         <TabsContent class="mt-0 grid gap-4" value="market">
@@ -131,50 +149,84 @@
             <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
               <div>
                 <h2 class="font-heading text-3xl font-semibold tracking-tight">
-                  {selectedSymbol} price with VIX context
+                  {selectedSymbol} OHLC with dollar volume
                 </h2>
                 <p class="mt-2 text-muted-foreground">
-                  Closing history for the selected symbol, overlaid with the published
-                  volatility context when available.
+                  Candlestick sessions with a lower dollar-volume pane in the same chart.
+                  Default view is one month of daily bars.
                 </p>
               </div>
             </div>
-            {#key selectedSymbol}
-              <PriceChart overlayPoints={vixPoints} points={marketPoints} />
-            {/key}
-          </Card>
-          <Card class="space-y-4 rounded-[28px] border bg-card/90 p-6 shadow-[0_18px_50px_rgba(18,26,33,0.12)]">
-            <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+            <div class="grid gap-4 md:grid-cols-2">
               <div>
-                <h2 class="font-heading text-3xl font-semibold tracking-tight">Nominal quote volume</h2>
-                <p class="mt-2 text-muted-foreground">
-                  Repository-published `quote_volume` derived from close multiplied by share
-                  volume.
+                <p class="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                  Lookback
                 </p>
+                <div class="flex flex-wrap gap-2">
+                  {#each LOOKBACK_PRESETS as lookback}
+                    <button
+                      class={`rounded-full border px-3 py-1.5 text-sm transition ${
+                        lookback === selectedLookback
+                          ? "border-ring bg-accent/60 text-foreground"
+                          : "bg-background/70 text-muted-foreground hover:border-ring/40 hover:text-foreground"
+                      }`}
+                      on:click={() => (selectedLookback = lookback)}
+                      type="button"
+                    >
+                      {lookback}
+                    </button>
+                  {/each}
+                </div>
+              </div>
+              <div>
+                <p class="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                  Bar Period
+                </p>
+                <div class="flex flex-wrap gap-2">
+                  {#each AGGREGATION_PERIODS as aggregation}
+                    <button
+                      class={`rounded-full border px-3 py-1.5 text-sm transition ${
+                        aggregation === selectedAggregation
+                          ? "border-ring bg-accent/60 text-foreground"
+                          : "bg-background/70 text-muted-foreground hover:border-ring/40 hover:text-foreground"
+                      }`}
+                      on:click={() => (selectedAggregation = aggregation)}
+                      type="button"
+                    >
+                      {aggregation}
+                    </button>
+                  {/each}
+                </div>
               </div>
             </div>
             {#key selectedSymbol}
-              <VolumeChart points={marketPoints} />
+              <PriceChart points={marketPoints} />
             {/key}
           </Card>
         </TabsContent>
 
-        <TabsContent class="mt-0" value="distribution">
-          <DistributionPanel points={marketPoints} />
-        </TabsContent>
+        <TabsContent class="mt-0 grid gap-4" value="indices">
+          {#if data.dashboard.indexOptions.some((option) => option.hasConstituents)}
+            <Tabs bind:value={selectedIndex} class="gap-4">
+              <TabsList class="rounded-full p-1" variant="default">
+                {#each data.dashboard.indexOptions.filter((option) => option.hasConstituents) as option}
+                  <TabsTrigger class="rounded-full px-4 text-sm" value={option.key}>
+                    {option.label}
+                  </TabsTrigger>
+                {/each}
+              </TabsList>
 
-        <TabsContent class="mt-0 grid gap-4" value="constituents">
-          <Tabs bind:value={selectedIndex} class="gap-4">
-            <TabsList class="rounded-full p-1" variant="default">
-              <TabsTrigger class="rounded-full px-4 text-sm" value="sp500">S&amp;P 500</TabsTrigger>
-              <TabsTrigger class="rounded-full px-4 text-sm" value="nasdaq100">Nasdaq-100</TabsTrigger>
-            </TabsList>
-
-          <ConstituentTable
-            indexLabel={selectedIndex === "sp500" ? "S&P 500" : "Nasdaq-100"}
-            records={data.dashboard.constituentsByIndex[selectedIndex]}
-          />
-          </Tabs>
+              <ConstituentTable
+                indexLabel={data.dashboard.indexOptions.find((option) => option.key === selectedIndex)?.label ?? selectedIndex}
+                records={data.dashboard.constituentsByIndex[selectedIndex] ?? []}
+              />
+            </Tabs>
+          {:else}
+            <EmptyState
+              message="The packaged repository snapshot did not include any usable constituent files."
+              title="No index files available"
+            />
+          {/if}
         </TabsContent>
       </Tabs>
     {:else}

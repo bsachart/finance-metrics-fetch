@@ -9,7 +9,7 @@ import pytest
 
 from finance_metrics_fetch.config import enabled_tickers, load_config
 from finance_metrics_fetch.errors import ConfigValidationError
-from finance_metrics_fetch.models import TickerRole
+from finance_metrics_fetch.models import IndexSource, TickerRole
 
 
 def test_load_config_reads_valid_tickers(tmp_path: Path) -> None:
@@ -26,7 +26,15 @@ def test_load_config_reads_valid_tickers(tmp_path: Path) -> None:
                         "role": "benchmark",
                         "source": "yahoo_finance",
                     }
-                ]
+                ],
+                "indices": [
+                    {
+                        "key": "sp500",
+                        "label": "S&P 500",
+                        "enabled": True,
+                        "source": "wikipedia",
+                    }
+                ],
             }
         )
     )
@@ -36,6 +44,7 @@ def test_load_config_reads_valid_tickers(tmp_path: Path) -> None:
     assert len(document.tickers) == 1
     assert document.tickers[0].symbol == "VOO"
     assert document.tickers[0].role is TickerRole.BENCHMARK
+    assert document.indices[0].source is IndexSource.WIKIPEDIA
     assert enabled_tickers(document)[0].symbol == "VOO"
 
 
@@ -61,9 +70,55 @@ def test_load_config_rejects_duplicate_enabled_symbols(tmp_path: Path) -> None:
                         "source": "yahoo_finance",
                     },
                 ]
+                ,
+                "indices": [
+                    {
+                        "key": "sp500",
+                        "label": "S&P 500",
+                        "enabled": True,
+                        "source": "wikipedia",
+                    }
+                ],
             }
         )
     )
 
     with pytest.raises(ConfigValidationError, match="Duplicate enabled ticker symbol"):
+        load_config(config_path)
+
+
+def test_load_config_rejects_duplicate_enabled_indices(tmp_path: Path) -> None:
+    """Duplicate enabled indices should fail validation."""
+    config_path = tmp_path / "tickers.json"
+    config_path.write_text(
+        json.dumps(
+            {
+                "tickers": [
+                    {
+                        "symbol": "VOO",
+                        "label": "One",
+                        "enabled": True,
+                        "role": "benchmark",
+                        "source": "yahoo_finance",
+                    }
+                ],
+                "indices": [
+                    {
+                        "key": "sp500",
+                        "label": "S&P 500",
+                        "enabled": True,
+                        "source": "wikipedia",
+                    },
+                    {
+                        "key": "sp500",
+                        "label": "S&P 500 Duplicate",
+                        "enabled": True,
+                        "source": "wikipedia",
+                    },
+                ],
+            }
+        )
+    )
+
+    with pytest.raises(ConfigValidationError, match="Duplicate enabled index key"):
         load_config(config_path)

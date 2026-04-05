@@ -1,102 +1,102 @@
-index_name,symbol,name,sector,sub_industry,source_url,fetched_at
-nasdaq100,AAPL,Apple Inc.,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,ABNB,Airbnb,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,ADBE,Adobe Inc.,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,ADI,Analog Devices,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,ADP,Automatic Data Processing,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,ADSK,Autodesk,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,AEP,American Electric Power,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,ALNY,Alnylam Pharmaceuticals,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,AMAT,Applied Materials,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,AMD,Advanced Micro Devices,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,AMGN,Amgen,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,AMZN,Amazon,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,APP,AppLovin,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,ARM,Arm Holdings,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,ASML,ASML Holding,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,AVGO,Broadcom,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,AXON,Axon Enterprise,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,BKNG,Booking Holdings,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,BKR,Baker Hughes,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,CCEP,Coca-Cola Europacific Partners,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,CDNS,Cadence Design Systems,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,CEG,Constellation Energy,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,CHTR,Charter Communications,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,CMCSA,Comcast,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,COST,Costco,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,CPRT,Copart,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,CRWD,CrowdStrike,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,CSCO,Cisco,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,CSGP,CoStar Group,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,CSX,CSX Corporation,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,CTAS,Cintas,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,CTSH,Cognizant,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,DASH,DoorDash,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,DDOG,Datadog,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,DXCM,DexCom,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,EA,Electronic Arts,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,EXC,Exelon,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,FANG,Diamondback Energy,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,FAST,Fastenal,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,FER,Ferrovial,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,FTNT,Fortinet,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,GEHC,GE HealthCare,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,GILD,Gilead Sciences,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,GOOG,Alphabet Inc. (Class C),,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,GOOGL,Alphabet Inc. (Class A),,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,HON,Honeywell,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,IDXX,Idexx Laboratories,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,INSM,Insmed Incorporated,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,INTC,Intel,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,INTU,Intuit,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,ISRG,Intuitive Surgical,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,KDP,Keurig Dr Pepper,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,KHC,Kraft Heinz,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,KLAC,KLA Corporation,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,LIN,Linde plc,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,LRCX,Lam Research,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,MAR,Marriott International,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,MCHP,Microchip Technology,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,MDLZ,Mondelez International,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,MELI,Mercado Libre,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,META,Meta Platforms,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,MNST,Monster Beverage,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,MPWR,Monolithic Power Systems,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,MRVL,Marvell Technology,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,MSFT,Microsoft,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,MSTR,MicroStrategy,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,MU,Micron Technology,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,NFLX,"Netflix, Inc.",,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,NVDA,Nvidia,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,NXPI,NXP Semiconductors,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,ODFL,Old Dominion Freight Line,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,ORLY,O'Reilly Automotive,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,PANW,Palo Alto Networks,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,PAYX,Paychex,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,PCAR,Paccar,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,PDD,PDD Holdings,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,PEP,PepsiCo,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,PLTR,Palantir Technologies,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,PYPL,PayPal,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,QCOM,Qualcomm,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,REGN,Regeneron Pharmaceuticals,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,ROP,Roper Technologies,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,ROST,Ross Stores,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,SBUX,Starbucks,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,SHOP,Shopify,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,SNPS,Synopsys,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,STX,Seagate Technology,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,TEAM,Atlassian,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,TMUS,T-Mobile US,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,TRI,Thomson Reuters,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,TSLA,"Tesla, Inc.",,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,TTWO,Take-Two Interactive,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,TXN,Texas Instruments,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,VRSK,Verisk Analytics,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,VRTX,Vertex Pharmaceuticals,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,WBD,Warner Bros. Discovery,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,WDAY,"Workday, Inc.",,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,WDC,Western Digital,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,WMT,Walmart,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,XEL,Xcel Energy,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
-nasdaq100,ZS,Zscaler,,,https://en.wikipedia.org/wiki/Nasdaq-100,2026-04-05T15:18:40.452085+00:00
+index_name,symbol,name,sector,sub_industry,source_url
+nasdaq100,AAPL,Apple Inc.,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,ABNB,Airbnb,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,ADBE,Adobe Inc.,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,ADI,Analog Devices,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,ADP,Automatic Data Processing,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,ADSK,Autodesk,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,AEP,American Electric Power,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,ALNY,Alnylam Pharmaceuticals,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,AMAT,Applied Materials,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,AMD,Advanced Micro Devices,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,AMGN,Amgen,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,AMZN,Amazon,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,APP,AppLovin,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,ARM,Arm Holdings,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,ASML,ASML Holding,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,AVGO,Broadcom,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,AXON,Axon Enterprise,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,BKNG,Booking Holdings,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,BKR,Baker Hughes,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,CCEP,Coca-Cola Europacific Partners,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,CDNS,Cadence Design Systems,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,CEG,Constellation Energy,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,CHTR,Charter Communications,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,CMCSA,Comcast,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,COST,Costco,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,CPRT,Copart,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,CRWD,CrowdStrike,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,CSCO,Cisco,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,CSGP,CoStar Group,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,CSX,CSX Corporation,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,CTAS,Cintas,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,CTSH,Cognizant,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,DASH,DoorDash,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,DDOG,Datadog,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,DXCM,DexCom,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,EA,Electronic Arts,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,EXC,Exelon,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,FANG,Diamondback Energy,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,FAST,Fastenal,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,FER,Ferrovial,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,FTNT,Fortinet,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,GEHC,GE HealthCare,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,GILD,Gilead Sciences,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,GOOG,Alphabet Inc. (Class C),,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,GOOGL,Alphabet Inc. (Class A),,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,HON,Honeywell,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,IDXX,Idexx Laboratories,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,INSM,Insmed Incorporated,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,INTC,Intel,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,INTU,Intuit,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,ISRG,Intuitive Surgical,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,KDP,Keurig Dr Pepper,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,KHC,Kraft Heinz,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,KLAC,KLA Corporation,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,LIN,Linde plc,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,LRCX,Lam Research,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,MAR,Marriott International,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,MCHP,Microchip Technology,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,MDLZ,Mondelez International,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,MELI,Mercado Libre,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,META,Meta Platforms,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,MNST,Monster Beverage,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,MPWR,Monolithic Power Systems,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,MRVL,Marvell Technology,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,MSFT,Microsoft,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,MSTR,MicroStrategy,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,MU,Micron Technology,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,NFLX,"Netflix, Inc.",,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,NVDA,Nvidia,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,NXPI,NXP Semiconductors,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,ODFL,Old Dominion Freight Line,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,ORLY,O'Reilly Automotive,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,PANW,Palo Alto Networks,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,PAYX,Paychex,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,PCAR,Paccar,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,PDD,PDD Holdings,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,PEP,PepsiCo,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,PLTR,Palantir Technologies,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,PYPL,PayPal,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,QCOM,Qualcomm,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,REGN,Regeneron Pharmaceuticals,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,ROP,Roper Technologies,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,ROST,Ross Stores,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,SBUX,Starbucks,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,SHOP,Shopify,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,SNPS,Synopsys,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,STX,Seagate Technology,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,TEAM,Atlassian,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,TMUS,T-Mobile US,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,TRI,Thomson Reuters,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,TSLA,"Tesla, Inc.",,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,TTWO,Take-Two Interactive,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,TXN,Texas Instruments,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,VRSK,Verisk Analytics,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,VRTX,Vertex Pharmaceuticals,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,WBD,Warner Bros. Discovery,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,WDAY,"Workday, Inc.",,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,WDC,Western Digital,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,WMT,Walmart,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,XEL,Xcel Energy,,,https://en.wikipedia.org/wiki/Nasdaq-100
+nasdaq100,ZS,Zscaler,,,https://en.wikipedia.org/wiki/Nasdaq-100

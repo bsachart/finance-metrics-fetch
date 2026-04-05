@@ -1,14 +1,30 @@
-import type { BusinessDay, LineData } from "lightweight-charts";
+import type {
+  BusinessDay,
+  CandlestickData,
+  HistogramData,
+  LineData,
+} from "lightweight-charts";
 
 import type { MarketPoint, SummaryMetric } from "./types";
 
 export interface MarketSummary {
   latestClose: number;
-  latestQuoteVolume: number;
-  averageQuoteVolume: number;
+  latestDollarVolume: number;
+  averageDollarVolume: number;
   totalTradingDays: number;
   latestDate: string;
 }
+
+export interface VolumeScale {
+  divisor: number;
+  suffix: string;
+}
+
+export type LookbackPreset = "1W" | "1M" | "YTD" | "1Y" | "5Y" | "ALL";
+export type AggregationPeriod = "1D" | "1W" | "1M";
+
+export const LOOKBACK_PRESETS: LookbackPreset[] = ["1W", "1M", "YTD", "1Y", "5Y", "ALL"];
+export const AGGREGATION_PERIODS: AggregationPeriod[] = ["1D", "1W", "1M"];
 
 export function toBusinessDay(date: string): BusinessDay {
   const [year, month, day] = date.split("-").map(Number);
@@ -30,10 +46,101 @@ export function buildPriceSeries(points: MarketPoint[]): LineData[] {
   }));
 }
 
-export function buildQuoteVolumeSeries(points: MarketPoint[]): LineData[] {
+export function applyMarketView(
+  points: MarketPoint[],
+  lookback: LookbackPreset,
+  aggregation: AggregationPeriod,
+): MarketPoint[] {
+  const filtered = filterMarketPointsByLookback(points, lookback);
+  return aggregateMarketPoints(filtered, aggregation);
+}
+
+export function filterMarketPointsByLookback(
+  points: MarketPoint[],
+  lookback: LookbackPreset,
+): MarketPoint[] {
+  const sorted = sortMarketPoints(points);
+  const latest = sorted.at(-1);
+  if (!latest || lookback === "ALL") {
+    return sorted;
+  }
+
+  const latestDate = parseUtcDate(latest.date);
+  const threshold = getLookbackThreshold(latestDate, lookback);
+
+  return sorted.filter((point) => parseUtcDate(point.date) >= threshold);
+}
+
+export function aggregateMarketPoints(
+  points: MarketPoint[],
+  aggregation: AggregationPeriod,
+): MarketPoint[] {
+  const sorted = sortMarketPoints(points);
+  if (aggregation === "1D") {
+    return sorted;
+  }
+
+  const grouped = new Map<string, MarketPoint[]>();
+  for (const point of sorted) {
+    const bucket = aggregation === "1W" ? weekBucket(point.date) : monthBucket(point.date);
+    const existing = grouped.get(bucket) ?? [];
+    existing.push(point);
+    grouped.set(bucket, existing);
+  }
+
+  return Array.from(grouped.values()).map((bucketPoints) => {
+    const first = bucketPoints[0]!;
+    const last = bucketPoints.at(-1)!;
+
+    return {
+      close: last.close,
+      date: first.date,
+      high: Math.max(...bucketPoints.map((point) => point.high)),
+      low: Math.min(...bucketPoints.map((point) => point.low)),
+      open: first.open,
+      quote_volume: bucketPoints.reduce((total, point) => total + point.quote_volume, 0),
+      symbol: first.symbol,
+      volume: bucketPoints.reduce((total, point) => total + point.volume, 0),
+    };
+  });
+}
+
+export function buildCandlestickSeries(points: MarketPoint[]): CandlestickData[] {
   return sortMarketPoints(points).map((point) => ({
+    close: point.close,
+    high: point.high,
+    low: point.low,
+    open: point.open,
     time: toBusinessDay(point.date),
-    value: point.quote_volume,
+  }));
+}
+
+export function getVolumeScale(points: MarketPoint[]): VolumeScale {
+  const maxVolume = Math.max(...points.map((point) => point.quote_volume), 0);
+  if (maxVolume >= 1_000_000_000_000) {
+    return { divisor: 1_000_000_000_000, suffix: "T" };
+  }
+  if (maxVolume >= 1_000_000_000) {
+    return { divisor: 1_000_000_000, suffix: "B" };
+  }
+  if (maxVolume >= 1_000_000) {
+    return { divisor: 1_000_000, suffix: "M" };
+  }
+  if (maxVolume >= 1_000) {
+    return { divisor: 1_000, suffix: "K" };
+  }
+  return { divisor: 1, suffix: "" };
+}
+
+export function buildNormalizedQuoteVolumeSeries(
+  points: MarketPoint[],
+  scale: VolumeScale,
+): HistogramData[] {
+  return sortMarketPoints(points).map((point) => ({
+    color:
+      point.close >= point.open ? "rgba(15, 118, 110, 0.62)" : "rgba(220, 38, 38, 0.58)",
+    time: toBusinessDay(point.date),
+    value: point.quote_volume / scale.divisor,
   }));
 }
 
@@ -49,23 +156,23 @@ export function summarizeMarket(points: MarketPoint[]): MarketSummary | null {
     return null;
   }
 
-  const totalQuoteVolume = sorted.reduce(
+  const totalDollarVolume = sorted.reduce(
     (runningTotal, point) => runningTotal + point.quote_volume,
     0,
   );
 
   return {
+    averageDollarVolume: totalDollarVolume / sorted.length,
     latestClose: latest.close,
-    latestQuoteVolume: latest.quote_volume,
-    averageQuoteVolume: totalQuoteVolume / sorted.length,
-    totalTradingDays: sorted.length,
     latestDate: latest.date,
+    latestDollarVolume: latest.quote_volume,
+    totalTradingDays: sorted.length,
   };
 }
 
 function formatCompactNumber(value: number): string {
   return new Intl.NumberFormat("en-US", {
-    maximumFractionDigits: 2,
+    maximumFractionDigits: 1,
     notation: "compact",
   }).format(value);
 }
@@ -92,17 +199,66 @@ export function buildSummaryMetrics(points: MarketPoint[]): SummaryMetric[] {
       value: formatCurrency(summary.latestClose),
     },
     {
-      label: "Last quote volume",
-      value: formatCompactNumber(summary.latestQuoteVolume),
+      label: "Last dollar volume",
+      value: formatCompactNumber(summary.latestDollarVolume),
     },
     {
-      label: "Average quote volume",
-      value: formatCompactNumber(summary.averageQuoteVolume),
+      label: "Average dollar volume",
+      value: formatCompactNumber(summary.averageDollarVolume),
     },
     {
-      label: "Sessions",
+      label: "Bars",
       tone: "warm",
       value: summary.totalTradingDays.toLocaleString("en-US"),
     },
   ];
+}
+
+export function formatVolumeAxisValue(value: number, scale: VolumeScale): string {
+  const suffix = scale.suffix ? ` ${scale.suffix}` : "";
+  return `${trimTrailingZeros(value)}${suffix}`;
+}
+
+function trimTrailingZeros(value: number): string {
+  return value.toLocaleString("en-US", {
+    maximumFractionDigits: value >= 100 ? 0 : value >= 10 ? 1 : 2,
+    minimumFractionDigits: 0,
+  });
+}
+
+function getLookbackThreshold(latestDate: Date, lookback: LookbackPreset): Date {
+  const threshold = new Date(latestDate);
+  switch (lookback) {
+    case "1W":
+      threshold.setUTCDate(threshold.getUTCDate() - 7);
+      return threshold;
+    case "1M":
+      threshold.setUTCMonth(threshold.getUTCMonth() - 1);
+      return threshold;
+    case "YTD":
+      return new Date(Date.UTC(latestDate.getUTCFullYear(), 0, 1));
+    case "1Y":
+      threshold.setUTCFullYear(threshold.getUTCFullYear() - 1);
+      return threshold;
+    case "5Y":
+      threshold.setUTCFullYear(threshold.getUTCFullYear() - 5);
+      return threshold;
+    case "ALL":
+      return new Date(0);
+  }
+}
+
+function parseUtcDate(value: string): Date {
+  return new Date(`${value}T00:00:00Z`);
+}
+
+function weekBucket(value: string): string {
+  const date = parseUtcDate(value);
+  const day = (date.getUTCDay() + 6) % 7;
+  date.setUTCDate(date.getUTCDate() - day);
+  return date.toISOString().slice(0, 10);
+}
+
+function monthBucket(value: string): string {
+  return value.slice(0, 7);
 }
