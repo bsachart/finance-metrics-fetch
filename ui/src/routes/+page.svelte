@@ -139,7 +139,9 @@
                 </p>
               </div>
             </div>
-            <PriceChart overlayPoints={vixPoints} points={marketPoints} />
+            {#key selectedSymbol}
+              <PriceChart overlayPoints={vixPoints} points={marketPoints} />
+            {/key}
           </Card>
           <Card class="space-y-4 rounded-[28px] border bg-card/90 p-6 shadow-[0_18px_50px_rgba(18,26,33,0.12)]">
             <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
@@ -151,7 +153,9 @@
                 </p>
               </div>
             </div>
-            <VolumeChart points={marketPoints} />
+            {#key selectedSymbol}
+              <VolumeChart points={marketPoints} />
+            {/key}
           </Card>
         </TabsContent>
 
