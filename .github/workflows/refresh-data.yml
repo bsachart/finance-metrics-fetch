@@ -67,5 +67,9 @@ jobs:
     if: needs.refresh.outputs.changed == 'true'
     needs: refresh
     uses: ./.github/workflows/deploy-ui-reusable.yml
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     with:
       ref: ${{ needs.refresh.outputs.deployed_ref }}
