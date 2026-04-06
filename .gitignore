@@ -27,6 +27,7 @@ site/
 # Node and frontend artifacts
 node_modules/
 .svelte-kit/
+ui/static/published/
 
 # Editor and OS files
 .DS_Store

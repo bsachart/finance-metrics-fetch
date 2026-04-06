@@ -2,11 +2,17 @@ name: Deploy UI
 
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Refresh Market Data
+    types:
+      - completed
   push:
     branches:
       - main
     paths:
       - ".github/workflows/deploy-ui.yml"
+      - ".github/workflows/refresh-data.yml"
       - "config/tickers.json"
       - "data/**"
       - "ui/**"
@@ -25,10 +31,18 @@ concurrency:
 
 jobs:
   build:
+    if: >
+      github.event_name != 'workflow_run' ||
+      (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.head_branch == 'main'
+      )
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - name: Setup Node
         uses: actions/setup-node@v6
@@ -56,6 +70,12 @@ jobs:
           path: ui/build
 
   deploy:
+    if: >
+      github.event_name != 'workflow_run' ||
+      (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.head_branch == 'main'
+      )
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
