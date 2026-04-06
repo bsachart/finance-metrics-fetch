@@ -14,7 +14,7 @@
     TickMarkType,
     type Time,
   } from "lightweight-charts";
-  import { onDestroy, onMount, tick } from "svelte";
+  import { onDestroy, onMount } from "svelte";
 
   import {
     buildCandlestickSeries,
@@ -22,7 +22,6 @@
     buildNormalizedQuoteVolumeSeries,
     buildPriceSeries,
     formatChartAxisDate,
-    formatChartHudDate,
     formatVolumeAxisValue,
     getVolumeScale,
   } from "$data/market";
@@ -59,7 +58,7 @@
   let volumeSeries: ISeriesApi<"Histogram"> | null = null;
   let vixSeries: ISeriesApi<"Area"> | null = null;
   let mounted = false;
-  let setupVersion = 0;
+  let hasInitialFit = false;
 
   $: sortedPoints = sortPoints(points);
   $: sortedVixPoints = sortPoints(vixPoints);
@@ -80,12 +79,6 @@
     if (!host) {
       return;
     }
-
-    chart?.remove();
-    chart = null;
-    priceSeries = null;
-    volumeSeries = null;
-    vixSeries = null;
 
     chart = createChart(host, {
       autoSize: true,
@@ -148,100 +141,67 @@
       },
       0,
     );
-
-    volumeSeries = showVolume
-      ? chart.addSeries(
-          HistogramSeries,
-          {
-            base: 0,
-            lastValueVisible: false,
-            priceFormat: {
-              formatter: (value: number) => formatVolumeAxisValue(value, getVolumeScale(sortedPoints)),
-              minMove: 0.01,
-              type: "custom",
-            },
-            priceLineVisible: false,
-            priceScaleId: "right",
-          },
-          1,
-        )
-      : null;
-
-    vixSeries = showVixPane
-      ? chart.addSeries(
-          AreaSeries,
-          {
-            crosshairMarkerBorderColor: vixColor,
-            crosshairMarkerBackgroundColor: "#ffffff",
-            crosshairMarkerRadius: 4,
-            lastValueVisible: false,
-            lineColor: vixColor,
-            lineWidth: 2,
-            priceLineVisible: false,
-            priceScaleId: "left",
-            topColor: withOpacity(vixColor, 0.16),
-            bottomColor: withOpacity(vixColor, 0.04),
-            autoscaleInfoProvider: vixAutoscaleInfoProvider,
-          },
-          1,
-        )
-      : null;
-
-    const panes = chart.panes();
-    panes[0]?.setStretchFactor(showAnalyticsPane ? 0.76 : 1);
-    panes[1]?.setStretchFactor(showAnalyticsPane ? 0.24 : 0);
-
-    chart.priceScale("left", 0).applyOptions({
-      borderVisible: false,
-      scaleMargins: {
-        top: 0.05,
-        bottom: 0.05,
-      },
-      textColor: inkColor,
-      visible: true,
-    });
-    chart.priceScale("right", 0).applyOptions({
-      borderVisible: false,
-      visible: false,
-    });
-
-    if (showVixPane && panes[1]) {
-      chart.priceScale("left", 1).applyOptions({
-        borderVisible: false,
-        scaleMargins: {
-          top: 0.1,
-          bottom: 0,
-        },
-        textColor: vixColor,
-        visible: true,
-      });
-    }
-
-    if (panes[1]) {
-      chart.priceScale("right", 1).applyOptions({
-        borderVisible: false,
-        scaleMargins: {
-          top: 0.2,
-          bottom: 0,
-        },
-        textColor: volumeColor,
-        visible: showVolume,
-      });
-    }
-
-    syncSeries();
     chart.subscribeCrosshairMove(handleCrosshairMove);
+    syncChartStructure();
+    syncSeries();
   }
 
-  async function scheduleSetupChart(): Promise<void> {
-    const version = ++setupVersion;
-    await tick();
-
-    if (!mounted || version !== setupVersion || !host?.isConnected) {
+  function syncChartStructure(): void {
+    if (!chart || !priceSeries) {
       return;
     }
 
-    setupChart();
+    const logicalRange = chart.timeScale().getVisibleLogicalRange();
+
+    if (showVolume && !volumeSeries) {
+      volumeSeries = chart.addSeries(
+        HistogramSeries,
+        {
+          base: 0,
+          lastValueVisible: false,
+          priceFormat: {
+            formatter: (value: number) => formatVolumeAxisValue(value, getVolumeScale(sortedPoints)),
+            minMove: 0.01,
+            type: "custom",
+          },
+          priceLineVisible: false,
+          priceScaleId: "right",
+        },
+        1,
+      );
+    } else if (!showVolume && volumeSeries) {
+      chart.removeSeries(volumeSeries);
+      volumeSeries = null;
+    }
+
+    if (showVixPane && !vixSeries) {
+      vixSeries = chart.addSeries(
+        AreaSeries,
+        {
+          crosshairMarkerBorderColor: vixColor,
+          crosshairMarkerBackgroundColor: "#ffffff",
+          crosshairMarkerRadius: 4,
+          lastValueVisible: false,
+          lineColor: vixColor,
+          lineWidth: 2,
+          priceLineVisible: false,
+          priceScaleId: "left",
+          topColor: withOpacity(vixColor, 0.16),
+          bottomColor: withOpacity(vixColor, 0.04),
+          autoscaleInfoProvider: vixAutoscaleInfoProvider,
+        },
+        1,
+      );
+    } else if (!showVixPane && vixSeries) {
+      chart.removeSeries(vixSeries);
+      vixSeries = null;
+    }
+
+    applyPaneOptions();
+
+    if (logicalRange) {
+      chart.timeScale().setVisibleLogicalRange(logicalRange);
+    }
   }
 
   function syncSeries(): void {
@@ -274,8 +234,58 @@
       vixSeries?.setData([]);
     }
 
-    chart.timeScale().fitContent();
+    if (!hasInitialFit) {
+      chart.timeScale().fitContent();
+      hasInitialFit = true;
+    }
     onHudChange(latestHudState);
+  }
+
+  function applyPaneOptions(): void {
+    if (!chart) {
+      return;
+    }
+
+    const panes = chart.panes();
+    const hasAnalyticsPane = Boolean(volumeSeries || vixSeries);
+
+    panes[0]?.setStretchFactor(hasAnalyticsPane ? 0.76 : 1);
+    panes[1]?.setStretchFactor(hasAnalyticsPane ? 0.24 : 0);
+
+    chart.priceScale("left", 0).applyOptions({
+      borderVisible: false,
+      scaleMargins: {
+        top: 0.05,
+        bottom: 0.05,
+      },
+      textColor: inkColor,
+      visible: true,
+    });
+    chart.priceScale("right", 0).applyOptions({
+      borderVisible: false,
+      visible: false,
+    });
+
+    if (panes[1]) {
+      chart.priceScale("left", 1).applyOptions({
+        borderVisible: false,
+        scaleMargins: {
+          top: 0.1,
+          bottom: 0,
+        },
+        textColor: vixColor,
+        visible: Boolean(vixSeries),
+      });
+      chart.priceScale("right", 1).applyOptions({
+        borderVisible: false,
+        scaleMargins: {
+          top: 0.2,
+          bottom: 0,
+        },
+        textColor: volumeColor,
+        visible: Boolean(volumeSeries),
+      });
+    }
   }
 
   function handleCrosshairMove(param: MouseEventParams<Time>): void {
@@ -350,15 +360,18 @@
 
   onMount(() => {
     mounted = true;
-    void scheduleSetupChart();
+    setupChart();
   });
 
-  $: if (mounted) {
-    points;
-    vixPoints;
+  $: if (mounted && chart) {
+    sortedPoints;
+    sortedVixPoints;
     showVolume;
-    showVix;
-    void scheduleSetupChart();
+    showVixPane;
+    vixColor;
+    latestHudState;
+    syncChartStructure();
+    syncSeries();
   }
 
   onDestroy(() => {
