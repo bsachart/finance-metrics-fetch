@@ -14,7 +14,7 @@
     TickMarkType,
     type Time,
   } from "lightweight-charts";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount, tick } from "svelte";
 
   import {
     buildCandlestickSeries,
@@ -59,6 +59,7 @@
   let volumeSeries: ISeriesApi<"Histogram"> | null = null;
   let vixSeries: ISeriesApi<"Area"> | null = null;
   let mounted = false;
+  let setupVersion = 0;
 
   $: sortedPoints = sortPoints(points);
   $: sortedVixPoints = sortPoints(vixPoints);
@@ -214,11 +215,6 @@
         textColor: vixColor,
         visible: true,
       });
-    } else if (panes[1]) {
-      chart.priceScale("left", 1).applyOptions({
-        borderVisible: false,
-        visible: false,
-      });
     }
 
     if (panes[1]) {
@@ -235,6 +231,17 @@
 
     syncSeries();
     chart.subscribeCrosshairMove(handleCrosshairMove);
+  }
+
+  async function scheduleSetupChart(): Promise<void> {
+    const version = ++setupVersion;
+    await tick();
+
+    if (!mounted || version !== setupVersion || !host?.isConnected) {
+      return;
+    }
+
+    setupChart();
   }
 
   function syncSeries(): void {
@@ -343,7 +350,7 @@
 
   onMount(() => {
     mounted = true;
-    setupChart();
+    void scheduleSetupChart();
   });
 
   $: if (mounted) {
@@ -351,7 +358,7 @@
     vixPoints;
     showVolume;
     showVix;
-    setupChart();
+    void scheduleSetupChart();
   }
 
   onDestroy(() => {
