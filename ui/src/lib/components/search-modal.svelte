@@ -233,9 +233,6 @@
           >
             <div class="search-modal-symbol">
               <span class="search-modal-symbol-text">{entry.symbol}</span>
-              {#if entry.isRecent}
-                <span class="search-modal-symbol-badge">Recent</span>
-              {/if}
             </div>
             <span class="search-modal-label">{entry.label}</span>
             <span class="search-modal-last">${formatPrice(entry.lastClose)}</span>
@@ -466,17 +463,6 @@
     color: #13212f;
     font-size: 0.95rem;
     font-weight: 600;
-  }
-
-  .search-modal-symbol-badge {
-    background: rgba(15, 118, 110, 0.1);
-    border-radius: 999px;
-    color: #0f766e;
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    padding: 0.2rem 0.45rem;
-    text-transform: uppercase;
   }
 
   .search-modal-label,

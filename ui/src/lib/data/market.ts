@@ -172,8 +172,8 @@ export function formatChartHudDate(value: string): string {
 
 export function formatChartAxisDate(value: string): string {
   return parseUtcDate(value).toLocaleDateString("en-US", {
+    day: "numeric",
     month: "short",
-    year: "2-digit",
   });
 }
 
