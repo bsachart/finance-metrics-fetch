@@ -14,7 +14,7 @@
     TickMarkType,
     type Time,
   } from "lightweight-charts";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount, tick } from "svelte";
 
   import {
     buildCandlestickSeries,
@@ -57,13 +57,16 @@
   let priceSeries: ISeriesApi<"Candlestick"> | null = null;
   let volumeSeries: ISeriesApi<"Histogram"> | null = null;
   let vixSeries: ISeriesApi<"Area"> | null = null;
-  let mounted = false;
   let hasInitialFit = false;
+  let lastDataSignature = "";
+  let lastStructureSignature = "";
+  let rebuildVersion = 0;
+  let rebuilding = false;
+  let concealChart = false;
 
   $: sortedPoints = sortPoints(points);
   $: sortedVixPoints = sortPoints(vixPoints);
   $: showVixPane = showVix && sortedVixPoints.length > 0;
-  $: showAnalyticsPane = showVolume || showVixPane;
   $: vixColor = getVixColor(sortedVixPoints);
   $: pointByDate = new Map(sortedPoints.map((point) => [point.date, point]));
   $: pointIndexByDate = new Map(sortedPoints.map((point, index) => [point.date, index]));
@@ -74,6 +77,16 @@
     "latest",
     sortedPoints.at(-2) ?? null,
   );
+  $: dataSignature = getDataSignature(sortedPoints);
+  $: structureSignature = `${showVolume}-${showVixPane}`;
+
+  function destroyChart(): void {
+    chart?.remove();
+    chart = null;
+    priceSeries = null;
+    volumeSeries = null;
+    vixSeries = null;
+  }
 
   function setupChart(): void {
     if (!host) {
@@ -141,67 +154,69 @@
       },
       0,
     );
-    chart.subscribeCrosshairMove(handleCrosshairMove);
-    syncChartStructure();
-    syncSeries();
-  }
 
-  function syncChartStructure(): void {
-    if (!chart || !priceSeries) {
-      return;
+    if (showVolume) {
+      volumeSeries = createVolumeSeries(chart, sortedPoints);
     }
 
-    const logicalRange = chart.timeScale().getVisibleLogicalRange();
-
-    if (showVolume && !volumeSeries) {
-      volumeSeries = chart.addSeries(
-        HistogramSeries,
-        {
-          base: 0,
-          lastValueVisible: false,
-          priceFormat: {
-            formatter: (value: number) => formatVolumeAxisValue(value, getVolumeScale(sortedPoints)),
-            minMove: 0.01,
-            type: "custom",
-          },
-          priceLineVisible: false,
-          priceScaleId: "right",
-        },
-        1,
-      );
-    } else if (!showVolume && volumeSeries) {
-      chart.removeSeries(volumeSeries);
-      volumeSeries = null;
-    }
-
-    if (showVixPane && !vixSeries) {
-      vixSeries = chart.addSeries(
-        AreaSeries,
-        {
-          crosshairMarkerBorderColor: vixColor,
-          crosshairMarkerBackgroundColor: "#ffffff",
-          crosshairMarkerRadius: 4,
-          lastValueVisible: false,
-          lineColor: vixColor,
-          lineWidth: 2,
-          priceLineVisible: false,
-          priceScaleId: "left",
-          topColor: withOpacity(vixColor, 0.16),
-          bottomColor: withOpacity(vixColor, 0.04),
-          autoscaleInfoProvider: vixAutoscaleInfoProvider,
-        },
-        1,
-      );
-    } else if (!showVixPane && vixSeries) {
-      chart.removeSeries(vixSeries);
-      vixSeries = null;
+    if (showVixPane) {
+      vixSeries = createVixSeries(chart, vixColor, vixAutoscaleInfoProvider);
     }
 
     applyPaneOptions();
+    syncSeries();
+
+    chart.subscribeCrosshairMove(handleCrosshairMove);
+    lastStructureSignature = structureSignature;
+  }
+
+  async function rebuildChart(preserveLogicalRange = false): Promise<void> {
+    const version = ++rebuildVersion;
+    const logicalRange =
+      preserveLogicalRange && hasInitialFit && dataSignature === lastDataSignature
+        ? chart?.timeScale().getVisibleLogicalRange() ?? null
+        : null;
+
+    rebuilding = true;
+    await tick();
+
+    if (version !== rebuildVersion || !host) {
+      rebuilding = false;
+      return;
+    }
+
+    concealChart = true;
+    destroyChart();
+    setupChart();
+
+    if (!chart || version !== rebuildVersion) {
+      concealChart = false;
+      rebuilding = false;
+      return;
+    }
 
     if (logicalRange) {
       chart.timeScale().setVisibleLogicalRange(logicalRange);
+    } else {
+      chart.timeScale().fitContent();
+      hasInitialFit = true;
+      lastDataSignature = dataSignature;
     }
+
+    requestAnimationFrame(() => {
+      if (version !== rebuildVersion || !chart) {
+        concealChart = false;
+        rebuilding = false;
+        return;
+      }
+
+      if (logicalRange) {
+        chart.timeScale().setVisibleLogicalRange(logicalRange);
+      }
+
+      concealChart = false;
+      rebuilding = false;
+    });
   }
 
   function syncSeries(): void {
@@ -234,11 +249,58 @@
       vixSeries?.setData([]);
     }
 
-    if (!hasInitialFit) {
+    const shouldFitContent = !hasInitialFit || dataSignature !== lastDataSignature;
+    if (shouldFitContent) {
       chart.timeScale().fitContent();
       hasInitialFit = true;
+      lastDataSignature = dataSignature;
     }
     onHudChange(latestHudState);
+  }
+
+  function createVolumeSeries(
+    chartApi: IChartApi,
+    seriesPoints: MarketPoint[],
+  ): ISeriesApi<"Histogram"> {
+    return chartApi.addSeries(
+      HistogramSeries,
+      {
+        base: 0,
+        lastValueVisible: false,
+        priceFormat: {
+          formatter: (value: number) => formatVolumeAxisValue(value, getVolumeScale(seriesPoints)),
+          minMove: 0.01,
+          type: "custom",
+        },
+        priceLineVisible: false,
+        priceScaleId: "right",
+      },
+      1,
+    );
+  }
+
+  function createVixSeries(
+    chartApi: IChartApi,
+    color: string,
+    autoscaleInfoProvider: AutoscaleInfoProvider,
+  ): ISeriesApi<"Area"> {
+    return chartApi.addSeries(
+      AreaSeries,
+      {
+        crosshairMarkerBorderColor: color,
+        crosshairMarkerBackgroundColor: "#ffffff",
+        crosshairMarkerRadius: 4,
+        lastValueVisible: false,
+        lineColor: color,
+        lineWidth: 2,
+        priceLineVisible: false,
+        priceScaleId: "left",
+        topColor: withOpacity(color, 0.16),
+        bottomColor: withOpacity(color, 0.04),
+        autoscaleInfoProvider,
+      },
+      1,
+    );
   }
 
   function applyPaneOptions(): void {
@@ -250,7 +312,9 @@
     const hasAnalyticsPane = Boolean(volumeSeries || vixSeries);
 
     panes[0]?.setStretchFactor(hasAnalyticsPane ? 0.76 : 1);
-    panes[1]?.setStretchFactor(hasAnalyticsPane ? 0.24 : 0);
+    if (hasAnalyticsPane) {
+      panes[1]?.setStretchFactor(0.24);
+    }
 
     chart.priceScale("left", 0).applyOptions({
       borderVisible: false,
@@ -267,24 +331,29 @@
     });
 
     if (panes[1]) {
-      chart.priceScale("left", 1).applyOptions({
-        borderVisible: false,
-        scaleMargins: {
-          top: 0.1,
-          bottom: 0,
-        },
-        textColor: vixColor,
-        visible: Boolean(vixSeries),
-      });
-      chart.priceScale("right", 1).applyOptions({
-        borderVisible: false,
-        scaleMargins: {
-          top: 0.2,
-          bottom: 0,
-        },
-        textColor: volumeColor,
-        visible: Boolean(volumeSeries),
-      });
+      if (vixSeries) {
+        chart.priceScale("left", 1).applyOptions({
+          borderVisible: false,
+          scaleMargins: {
+            top: 0.1,
+            bottom: 0,
+          },
+          textColor: vixColor,
+          visible: true,
+        });
+      }
+
+      if (volumeSeries) {
+        chart.priceScale("right", 1).applyOptions({
+          borderVisible: false,
+          scaleMargins: {
+            top: 0.2,
+            bottom: 0,
+          },
+          textColor: volumeColor,
+          visible: true,
+        });
+      }
     }
   }
 
@@ -358,34 +427,55 @@
     return `rgba(${red}, ${green}, ${blue}, ${opacity})`;
   }
 
+  function getDataSignature(seriesPoints: MarketPoint[]): string {
+    return [
+      seriesPoints[0]?.date ?? "",
+      seriesPoints.at(-1)?.date ?? "",
+      seriesPoints.length,
+    ].join("|");
+  }
+
   onMount(() => {
-    mounted = true;
-    setupChart();
+    let cancelled = false;
+
+    void rebuildChart(false).then(() => {
+      if (cancelled) {
+        rebuildVersion += 1;
+        destroyChart();
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      rebuildVersion += 1;
+    };
   });
 
-  $: if (mounted && chart) {
+  $: if (chart) {
+    structureSignature;
+    if (!rebuilding && structureSignature !== lastStructureSignature) {
+      void rebuildChart(true);
+    }
+  }
+
+  $: if (chart) {
     sortedPoints;
     sortedVixPoints;
-    showVolume;
-    showVixPane;
     vixColor;
     latestHudState;
-    syncChartStructure();
-    syncSeries();
+    if (!rebuilding && structureSignature === lastStructureSignature) {
+      syncSeries();
+    }
   }
 
   onDestroy(() => {
-    chart?.remove();
-    chart = null;
-    priceSeries = null;
-    volumeSeries = null;
-    vixSeries = null;
-    mounted = false;
+    rebuildVersion += 1;
+    destroyChart();
   });
 </script>
 
 <div class="chart-shell">
-  <div bind:this={host} class="chart-root"></div>
+  <div bind:this={host} class:chart-root-hidden={concealChart} class="chart-root"></div>
 </div>
 
 <style>
@@ -396,5 +486,9 @@
   .chart-root {
     height: 600px;
     width: 100%;
+  }
+
+  .chart-root-hidden {
+    visibility: hidden;
   }
 </style>
