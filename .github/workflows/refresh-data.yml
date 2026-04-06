@@ -13,6 +13,9 @@ permissions:
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.changes.outputs.changed }}
+      deployed_ref: ${{ steps.deployed_ref.outputs.ref }}
 
     steps:
       - name: Check out repository
@@ -51,6 +54,18 @@ jobs:
           git add data config
           git commit -m "chore: refresh market data"
 
+      - name: Capture deployed ref
+        id: deployed_ref
+        if: steps.changes.outputs.changed == 'true'
+        run: echo "ref=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
       - name: Push refreshed data
         if: steps.changes.outputs.changed == 'true'
         run: git push
+
+  deploy:
+    if: needs.refresh.outputs.changed == 'true'
+    needs: refresh
+    uses: ./.github/workflows/deploy-ui-reusable.yml
+    with:
+      ref: ${{ needs.refresh.outputs.deployed_ref }}
