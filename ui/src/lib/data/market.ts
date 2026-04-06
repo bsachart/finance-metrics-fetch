@@ -3,6 +3,7 @@ import type {
   CandlestickData,
   HistogramData,
   LineData,
+  TickMarkType,
 } from "lightweight-charts";
 
 import type { ChartHudState, MarketPoint } from "./types";
@@ -170,10 +171,31 @@ export function formatChartHudDate(value: string): string {
   });
 }
 
-export function formatChartAxisDate(value: string): string {
-  return parseUtcDate(value).toLocaleDateString("en-US", {
+export function formatChartAxisDate(value: string, tickMarkType?: TickMarkType): string {
+  const date = parseUtcDate(value);
+
+  if (tickMarkType === undefined) {
+    return date.toLocaleDateString("en-US", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  }
+
+  if (tickMarkType === 0) {
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+    });
+  }
+
+  if (tickMarkType === 1) {
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+    });
+  }
+
+  return date.toLocaleDateString("en-US", {
     day: "numeric",
-    month: "short",
   });
 }
 

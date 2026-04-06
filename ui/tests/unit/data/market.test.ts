@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { TickMarkType } from "lightweight-charts";
 
 import {
   aggregateMarketPoints,
@@ -73,7 +74,10 @@ describe("market helpers", () => {
     expect(hudState?.close).toBe(510);
     expect(hudState?.source).toBe("latest");
     expect(formatChartHudDate("2026-04-05")).toBe("Apr 05, 2026");
-    expect(formatChartAxisDate("2026-04-05")).toBe("Apr 5");
+    expect(formatChartAxisDate("2026-04-05")).toBe("Apr 5, 2026");
+    expect(formatChartAxisDate("2026-04-05", TickMarkType.Year)).toBe("2026");
+    expect(formatChartAxisDate("2026-04-05", TickMarkType.Month)).toBe("Apr");
+    expect(formatChartAxisDate("2026-04-05", TickMarkType.DayOfMonth)).toBe("5");
     expect(formatChartHudVolume(255000, getVolumeScale(points))).toBe("$255 K");
   });
 });

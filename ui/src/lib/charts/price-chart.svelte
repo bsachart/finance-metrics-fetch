@@ -11,6 +11,7 @@
     type MouseEventParams,
     type ISeriesApi,
     type TickMarkFormatter,
+    TickMarkType,
     type Time,
   } from "lightweight-charts";
   import { onDestroy, onMount } from "svelte";
@@ -40,7 +41,8 @@
   const mutedVixColor = "#7c5cff";
   const elevatedVixColor = "#d97706";
   const elevatedVixThreshold = 20;
-  const tickMarkFormatter: TickMarkFormatter = (time: Time) => formatAxisDate(time);
+  const tickMarkFormatter: TickMarkFormatter = (time: Time, tickMarkType) =>
+    formatAxisDate(time, tickMarkType);
   const vixAutoscaleInfoProvider: AutoscaleInfoProvider = (
     original: () => AutoscaleInfo | null,
   ) => {
@@ -310,13 +312,13 @@
     return `${time.year}-${String(time.month).padStart(2, "0")}-${String(time.day).padStart(2, "0")}`;
   }
 
-  function formatAxisDate(time: Time): string {
+  function formatAxisDate(time: Time, tickMarkType: TickMarkType): string {
     const dateKey = toDateKey(time);
     if (!dateKey) {
       return "";
     }
 
-    return formatChartAxisDate(dateKey);
+    return formatChartAxisDate(dateKey, tickMarkType);
   }
 
   function getVixColor(seriesPoints: MarketPoint[]): string {
