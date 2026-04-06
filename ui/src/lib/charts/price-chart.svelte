@@ -88,6 +88,29 @@
     vixSeries = null;
   }
 
+  function getPreservedLogicalRange(preserveLogicalRange: boolean) {
+    if (!preserveLogicalRange || !hasInitialFit || dataSignature !== lastDataSignature) {
+      return null;
+    }
+
+    return chart?.timeScale().getVisibleLogicalRange() ?? null;
+  }
+
+  function syncViewport(logicalRange: ReturnType<typeof getPreservedLogicalRange>): void {
+    if (!chart) {
+      return;
+    }
+
+    if (logicalRange) {
+      chart.timeScale().setVisibleLogicalRange(logicalRange);
+      return;
+    }
+
+    chart.timeScale().fitContent();
+    hasInitialFit = true;
+    lastDataSignature = dataSignature;
+  }
+
   function setupChart(): void {
     if (!host) {
       return;
@@ -172,10 +195,7 @@
 
   async function rebuildChart(preserveLogicalRange = false): Promise<void> {
     const version = ++rebuildVersion;
-    const logicalRange =
-      preserveLogicalRange && hasInitialFit && dataSignature === lastDataSignature
-        ? chart?.timeScale().getVisibleLogicalRange() ?? null
-        : null;
+    const logicalRange = getPreservedLogicalRange(preserveLogicalRange);
 
     rebuilding = true;
     await tick();
@@ -195,13 +215,7 @@
       return;
     }
 
-    if (logicalRange) {
-      chart.timeScale().setVisibleLogicalRange(logicalRange);
-    } else {
-      chart.timeScale().fitContent();
-      hasInitialFit = true;
-      lastDataSignature = dataSignature;
-    }
+    syncViewport(logicalRange);
 
     requestAnimationFrame(() => {
       if (version !== rebuildVersion || !chart) {
@@ -211,7 +225,7 @@
       }
 
       if (logicalRange) {
-        chart.timeScale().setVisibleLogicalRange(logicalRange);
+        syncViewport(logicalRange);
       }
 
       concealChart = false;
@@ -246,7 +260,7 @@
       });
       vixSeries.setData(buildPriceSeries(sortedVixPoints));
     } else if (vixSeries) {
-      vixSeries?.setData([]);
+      vixSeries.setData([]);
     }
 
     const shouldFitContent = !hasInitialFit || dataSignature !== lastDataSignature;
@@ -436,19 +450,7 @@
   }
 
   onMount(() => {
-    let cancelled = false;
-
-    void rebuildChart(false).then(() => {
-      if (cancelled) {
-        rebuildVersion += 1;
-        destroyChart();
-      }
-    });
-
-    return () => {
-      cancelled = true;
-      rebuildVersion += 1;
-    };
+    void rebuildChart(false);
   });
 
   $: if (chart) {
