@@ -9,6 +9,8 @@
     LOOKBACK_PRESETS,
     applyMarketView,
     buildChartHudState,
+    formatChartHudChange,
+    formatChartHudChangePercent,
     formatChartHudDate,
     formatChartHudPrice,
     formatChartHudVolume,
@@ -171,8 +173,18 @@
     marketPoints.at(-1) ?? null,
     showVixOverlay ? (vixPoints.at(-1) ?? null) : null,
     "latest",
+    marketPoints.at(-2) ?? null,
   );
   $: displayedHudState = hoverHudState ?? latestHudState;
+  $: displayedHudChange = displayedHudState?.change ?? null;
+  $: hudChangeTone =
+    displayedHudChange === null
+      ? "text-muted-foreground"
+      : displayedHudChange > 0
+        ? "text-teal-700"
+        : displayedHudChange < 0
+          ? "text-rose-600"
+          : "text-muted-foreground";
   $: if (hasLoadedPreferences) {
     savePreferences();
   }
@@ -553,6 +565,11 @@
                       <span><span class="text-muted-foreground">H</span> {formatChartHudPrice(displayedHudState.high)}</span>
                       <span><span class="text-muted-foreground">L</span> {formatChartHudPrice(displayedHudState.low)}</span>
                       <span><span class="text-muted-foreground">C</span> {formatChartHudPrice(displayedHudState.close)}</span>
+                      {#if displayedHudState.change !== null && displayedHudState.changePercent !== null}
+                        <span class={hudChangeTone}>
+                          {formatChartHudChange(displayedHudState.change)} ({formatChartHudChangePercent(displayedHudState.changePercent)})
+                        </span>
+                      {/if}
                       {#if showVolume}
                         <span class="text-blue-600">Vol {formatChartHudVolume(displayedHudState.quoteVolume, volumeScale)}</span>
                       {/if}

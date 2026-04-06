@@ -146,12 +146,21 @@ export function buildChartHudState(
   point: MarketPoint | null,
   vixPoint: MarketPoint | null,
   source: "latest" | "hover",
+  previousPoint: MarketPoint | null = null,
 ): ChartHudState | null {
   if (!point) {
     return null;
   }
 
+  const change = previousPoint ? point.close - previousPoint.close : null;
+  const changePercent =
+    previousPoint && previousPoint.close !== 0
+      ? ((point.close - previousPoint.close) / previousPoint.close) * 100
+      : null;
+
   return {
+    change,
+    changePercent,
     close: point.close,
     date: point.date,
     high: point.high,
@@ -204,6 +213,16 @@ export function formatChartHudPrice(value: number): string {
     maximumFractionDigits: 2,
     minimumFractionDigits: 2,
   });
+}
+
+export function formatChartHudChange(value: number): string {
+  const sign = value > 0 ? "+" : "";
+  return `${sign}${formatChartHudPrice(value)}`;
+}
+
+export function formatChartHudChangePercent(value: number): string {
+  const sign = value > 0 ? "+" : "";
+  return `${sign}${value.toFixed(2)}%`;
 }
 
 export function formatChartHudVolume(value: number, scale: VolumeScale): string {

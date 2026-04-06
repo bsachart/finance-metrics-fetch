@@ -125,6 +125,8 @@ export interface ChartHudState {
   high: number;
   low: number;
   close: number;
+  change: number | null;
+  changePercent: number | null;
   quoteVolume: number;
   vix: number | null;
 }

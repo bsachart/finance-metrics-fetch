@@ -8,6 +8,8 @@ import {
   buildCandlestickSeries,
   buildNormalizedQuoteVolumeSeries,
   buildPriceSeries,
+  formatChartHudChange,
+  formatChartHudChangePercent,
   formatChartAxisDate,
   formatChartHudDate,
   formatChartHudVolume,
@@ -69,15 +71,19 @@ describe("market helpers", () => {
   });
 
   it("builds stable HUD state and compact formatting", () => {
-    const hudState = buildChartHudState(points[2]!, null, "latest");
+    const hudState = buildChartHudState(points[2]!, null, "latest", points[1]!);
 
     expect(hudState?.close).toBe(510);
+    expect(hudState?.change).toBe(7);
+    expect(hudState?.changePercent).toBeCloseTo(1.3916500994);
     expect(hudState?.source).toBe("latest");
     expect(formatChartHudDate("2026-04-05")).toBe("Apr 05, 2026");
     expect(formatChartAxisDate("2026-04-05")).toBe("Apr 5, 2026");
     expect(formatChartAxisDate("2026-04-05", TickMarkType.Year)).toBe("2026");
     expect(formatChartAxisDate("2026-04-05", TickMarkType.Month)).toBe("Apr");
     expect(formatChartAxisDate("2026-04-05", TickMarkType.DayOfMonth)).toBe("5");
+    expect(formatChartHudChange(2.34)).toBe("+2.34");
+    expect(formatChartHudChangePercent(5.04)).toBe("+5.04%");
     expect(formatChartHudVolume(255000, getVolumeScale(points))).toBe("$255 K");
   });
 });

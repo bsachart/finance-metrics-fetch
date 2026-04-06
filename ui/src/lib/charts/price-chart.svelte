@@ -66,11 +66,13 @@
   $: showAnalyticsPane = showVolume || showVixPane;
   $: vixColor = getVixColor(sortedVixPoints);
   $: pointByDate = new Map(sortedPoints.map((point) => [point.date, point]));
+  $: pointIndexByDate = new Map(sortedPoints.map((point, index) => [point.date, index]));
   $: vixPointByDate = new Map(sortedVixPoints.map((point) => [point.date, point]));
   $: latestHudState = buildChartHudState(
     sortedPoints.at(-1) ?? null,
     showVixPane ? (sortedVixPoints.at(-1) ?? null) : null,
     "latest",
+    sortedPoints.at(-2) ?? null,
   );
 
   function setupChart(): void {
@@ -287,11 +289,15 @@
       return;
     }
 
+    const pointIndex = pointIndexByDate.get(dateKey) ?? -1;
+    const previousPoint = pointIndex > 0 ? sortedPoints[pointIndex - 1] ?? null : null;
+
     onHudChange(
       buildChartHudState(
         point,
         showVixPane ? (vixPointByDate.get(dateKey) ?? null) : null,
         "hover",
+        previousPoint,
       ) ?? latestHudState,
     );
   }
