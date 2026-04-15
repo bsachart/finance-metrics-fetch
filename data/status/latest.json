@@ -1,8 +1,9 @@
 {
-  "started_at": "2026-04-15T13:00:00.023250+00:00",
-  "finished_at": "2026-04-15T13:01:59.843418+00:00",
-  "status": "partial_failure",
+  "started_at": "2026-04-15T14:58:56.300730+00:00",
+  "finished_at": "2026-04-15T14:59:01.248999+00:00",
+  "status": "success",
   "refreshed_symbols": [
+    "VOO",
     "^VIX",
     "VIRT",
     "GOOGL",
@@ -13,14 +14,9 @@
     "GLD",
     "SLV"
   ],
-  "failed_symbols": [
-    "VOO"
-  ],
-  "failed_sources": [
-    "yahoo_finance"
-  ],
+  "failed_symbols": [],
+  "failed_sources": [],
   "messages": [
-    "VOO: Failed to perform, curl: (28) Connection timed out after 30003 milliseconds. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.",
     "sp500: constituents updated",
     "nasdaq100: constituents updated"
   ]
