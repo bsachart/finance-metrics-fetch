@@ -420,141 +420,141 @@
 
               <div class="rounded-[22px] border bg-background/55 p-4">
                 <div class="flex flex-col gap-5">
-                  <div class="flex justify-end">
-                    <button
-                      class="flex w-full min-w-[18rem] items-center gap-3 rounded-full border bg-card/78 px-4 py-2 text-left transition hover:border-ring/30 hover:bg-card sm:w-auto"
-                      on:click={() => {
-                        isFinderOpen = true;
-                      }}
-                      type="button"
-                    >
-                      <span aria-hidden="true" class="text-muted-foreground">
-                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24">
-                          <circle
-                            cx="11"
-                            cy="11"
-                            r="7"
-                            stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-width="1.8"
-                          ></circle>
-                          <path
-                            d="m20 20-3.5-3.5"
-                            stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-width="1.8"
-                          ></path>
-                        </svg>
-                      </span>
-                      <span class="flex-1 text-sm text-muted-foreground">Find ticker...</span>
-                      <span class="rounded-md border bg-background/70 px-2 py-0.5 text-xs text-muted-foreground">
-                        Cmd/Ctrl+K
-                      </span>
-                    </button>
-                  </div>
-
-                  <div class="grid gap-4 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,0.8fr)_auto_auto]">
-                    <div>
-                      <p class="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                  <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+                    <div class="grid gap-4 md:grid-cols-[max-content_max-content]">
+                      <div class="space-y-2">
+                        <p class="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
                         Timeframe
-                      </p>
-                      <div class="flex flex-wrap gap-2">
-                        {#each LOOKBACK_PRESETS as lookback}
-                          <button
-                            class={`rounded-full border px-3 py-1.5 text-sm transition ${
-                              lookback === selectedLookback
-                                ? "border-ring bg-accent/70 text-foreground"
-                                : "bg-background/70 text-muted-foreground hover:border-ring/40 hover:text-foreground"
-                            }`}
-                            on:click={() => (selectedLookback = lookback)}
-                            type="button"
-                          >
-                            {lookback}
-                          </button>
-                        {/each}
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                          {#each LOOKBACK_PRESETS as lookback}
+                            <button
+                              class={`rounded-full border px-3 py-1.5 text-sm transition ${
+                                lookback === selectedLookback
+                                  ? "border-ring bg-accent/70 text-foreground"
+                                  : "bg-background/70 text-muted-foreground hover:border-ring/40 hover:text-foreground"
+                              }`}
+                              on:click={() => (selectedLookback = lookback)}
+                              type="button"
+                            >
+                              {lookback}
+                            </button>
+                          {/each}
+                        </div>
+                      </div>
+
+                      <div class="space-y-2">
+                        <p class="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                          Bars
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                          {#each AGGREGATION_PERIODS as aggregation}
+                            <button
+                              class={`rounded-full border px-3 py-1.5 text-sm transition ${
+                                aggregation === selectedAggregation
+                                  ? "border-ring bg-accent/55 text-foreground"
+                                  : "bg-background/70 text-muted-foreground hover:border-ring/40 hover:text-foreground"
+                              }`}
+                              on:click={() => (selectedAggregation = aggregation)}
+                              type="button"
+                            >
+                              {aggregation}
+                            </button>
+                          {/each}
+                        </div>
                       </div>
                     </div>
 
-                    <div>
-                      <p class="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                        Bars
-                      </p>
-                      <div class="flex flex-wrap gap-2">
-                        {#each AGGREGATION_PERIODS as aggregation}
-                          <button
-                            class={`rounded-full border px-3 py-1.5 text-sm transition ${
-                              aggregation === selectedAggregation
-                                ? "border-ring bg-accent/55 text-foreground"
-                                : "bg-background/70 text-muted-foreground hover:border-ring/40 hover:text-foreground"
+                    <div class="flex flex-col gap-3 xl:min-w-[24rem] xl:items-end">
+                      <div class="flex flex-wrap gap-2 xl:justify-end">
+                        <label
+                          class={`inline-flex min-w-[6.5rem] items-center justify-between gap-3 rounded-full border px-3 py-2 text-sm transition ${
+                            showVolume
+                              ? "border-ring bg-accent/70 text-foreground"
+                              : "bg-background/70 text-muted-foreground hover:border-ring/40 hover:text-foreground"
+                          } cursor-pointer`}
+                          for={volumeToggleId}
+                        >
+                          <span>Vol</span>
+                          <span
+                            class={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
+                              showVolume ? "bg-primary" : "bg-muted"
                             }`}
-                            on:click={() => (selectedAggregation = aggregation)}
-                            type="button"
                           >
-                            {aggregation}
-                          </button>
-                        {/each}
+                            <input
+                              bind:checked={showVolume}
+                              class="sr-only"
+                              id={volumeToggleId}
+                              type="checkbox"
+                            />
+                            <span
+                              class={`h-4 w-4 rounded-full bg-white shadow-sm transition ${
+                                showVolume ? "translate-x-6" : "translate-x-1"
+                              }`}
+                            ></span>
+                          </span>
+                        </label>
+
+                        <label
+                          class={`inline-flex min-w-[6.5rem] items-center justify-between gap-3 rounded-full border px-3 py-2 text-sm transition ${
+                            showVixOverlay || (showVix && !hasAnyVixData)
+                              ? "border-ring bg-accent/70 text-foreground"
+                              : "bg-background/70 text-muted-foreground hover:border-ring/40 hover:text-foreground"
+                          } ${(!hasAnyVixData || selectedSymbol === data.dashboard.vixSymbol) ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
+                          for={vixToggleId}
+                        >
+                          <span>VIX</span>
+                          <span
+                            class={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
+                              showVixOverlay ? "bg-primary" : "bg-muted"
+                            }`}
+                          >
+                            <input
+                              bind:checked={showVix}
+                              class="sr-only"
+                              disabled={!hasAnyVixData || selectedSymbol === data.dashboard.vixSymbol}
+                              id={vixToggleId}
+                              type="checkbox"
+                            />
+                            <span
+                              class={`h-4 w-4 rounded-full bg-white shadow-sm transition ${
+                                showVixOverlay ? "translate-x-6" : "translate-x-1"
+                              }`}
+                            ></span>
+                          </span>
+                        </label>
                       </div>
-                    </div>
 
-                    <div>
-                      <label
-                        class={`inline-flex min-w-[8rem] items-center justify-between gap-3 rounded-full border px-3 py-2 text-sm transition ${
-                          showVolume
-                            ? "border-ring bg-accent/70 text-foreground"
-                            : "bg-background/70 text-muted-foreground hover:border-ring/40 hover:text-foreground"
-                        } cursor-pointer`}
-                        for={volumeToggleId}
+                      <button
+                        class="flex w-full min-w-[16rem] items-center gap-3 rounded-full border bg-card/78 px-4 py-2 text-left transition hover:border-ring/30 hover:bg-card sm:w-auto xl:min-w-[18rem]"
+                        on:click={() => {
+                          isFinderOpen = true;
+                        }}
+                        type="button"
                       >
-                        <span>Vol</span>
-                        <span
-                          class={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-                            showVolume ? "bg-primary" : "bg-muted"
-                          }`}
-                        >
-                          <input
-                            bind:checked={showVolume}
-                            class="sr-only"
-                            id={volumeToggleId}
-                            type="checkbox"
-                          />
-                          <span
-                            class={`h-4 w-4 rounded-full bg-white shadow-sm transition ${
-                              showVolume ? "translate-x-6" : "translate-x-1"
-                            }`}
-                          ></span>
+                        <span aria-hidden="true" class="text-muted-foreground">
+                          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24">
+                            <circle
+                              cx="11"
+                              cy="11"
+                              r="7"
+                              stroke="currentColor"
+                              stroke-linecap="round"
+                              stroke-width="1.8"
+                            ></circle>
+                            <path
+                              d="m20 20-3.5-3.5"
+                              stroke="currentColor"
+                              stroke-linecap="round"
+                              stroke-width="1.8"
+                            ></path>
+                          </svg>
                         </span>
-                      </label>
-                    </div>
-
-                    <div>
-                      <label
-                        class={`inline-flex min-w-[8rem] items-center justify-between gap-3 rounded-full border px-3 py-2 text-sm transition ${
-                          showVixOverlay || (showVix && !hasAnyVixData)
-                            ? "border-ring bg-accent/70 text-foreground"
-                            : "bg-background/70 text-muted-foreground hover:border-ring/40 hover:text-foreground"
-                        } ${(!hasAnyVixData || selectedSymbol === data.dashboard.vixSymbol) ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
-                        for={vixToggleId}
-                      >
-                        <span>VIX</span>
-                        <span
-                          class={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-                            showVixOverlay ? "bg-primary" : "bg-muted"
-                          }`}
-                        >
-                          <input
-                            bind:checked={showVix}
-                            class="sr-only"
-                            disabled={!hasAnyVixData || selectedSymbol === data.dashboard.vixSymbol}
-                            id={vixToggleId}
-                            type="checkbox"
-                          />
-                          <span
-                            class={`h-4 w-4 rounded-full bg-white shadow-sm transition ${
-                              showVixOverlay ? "translate-x-6" : "translate-x-1"
-                            }`}
-                          ></span>
+                        <span class="flex-1 text-sm text-muted-foreground">Find ticker...</span>
+                        <span class="rounded-md border bg-background/70 px-2 py-0.5 text-xs text-muted-foreground">
+                          Cmd/Ctrl+K
                         </span>
-                      </label>
+                      </button>
                     </div>
                   </div>
 
