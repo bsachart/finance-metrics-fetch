@@ -4,6 +4,9 @@ import { sveltekit } from "@sveltejs/kit/vite";
 
 export default defineConfig({
   plugins: [tailwindcss(), sveltekit()],
+  resolve: {
+    conditions: ["browser", "development"],
+  },
   test: {
     environment: "jsdom",
     include: ["tests/unit/**/*.test.ts"],
