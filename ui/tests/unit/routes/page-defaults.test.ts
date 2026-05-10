@@ -1,4 +1,5 @@
 import { cleanup, render, screen } from "@testing-library/svelte";
+import { tick } from "svelte";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import Page from "../../../src/routes/+page.svelte";
@@ -39,5 +40,24 @@ describe("+page.svelte defaults", () => {
     const oneMonthButtons = screen.getAllByText("1M");
     // The first 1M is in Timeframe, the second is in Bars
     expect(oneMonthButtons[0].className).not.toContain("bg-accent/70");
+  });
+
+  it("persists the selected lookback to localStorage", async () => {
+    const { component } = render(Page, {
+      data: {
+        dashboard: mockDashboardData,
+        defaultSymbol: "VOO",
+        warnings: [],
+      },
+    });
+
+    const oneMonthButton = screen.getAllByText("1M")[0];
+    await oneMonthButton.click();
+    await tick();
+
+    // Verify localStorage was updated
+    const storageKey = "finance-metrics-fetch-v2";
+    const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
+    expect(saved.selectedLookback).toBe("1M");
   });
 });

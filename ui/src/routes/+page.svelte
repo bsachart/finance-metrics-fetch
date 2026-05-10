@@ -187,6 +187,15 @@
           : "text-muted-foreground";
   $: vixTone = (vixPoints.at(-1)?.close ?? 0) >= 20 ? "text-amber-600" : "text-[#7c5cff]";
   $: if (hasLoadedPreferences) {
+    // Explicitly track dependencies for persistent storage
+    selectedLookback;
+    selectedAggregation;
+    selectedSymbol;
+    activeSection;
+    showVolume;
+    showVix;
+    recentSymbols;
+    selectedIndex;
     savePreferences();
   }
 
