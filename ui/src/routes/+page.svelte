@@ -45,7 +45,7 @@
   export let data: PageData;
 
   const refreshIntervalMs = 60_000;
-  const storageKey = "finance-metrics-fetch-ui";
+  const storageKey = "finance-metrics-fetch-v2";
 
   type DashboardPreferences = {
     activeSection?: DashboardSection;
