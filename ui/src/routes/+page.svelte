@@ -67,7 +67,7 @@
   let recentSymbols: string[] = [];
   let searchQuery = "";
   let selectedIndex = getDefaultIndexKey();
-  let selectedLookback: LookbackPreset = "1M";
+  let selectedLookback: LookbackPreset = "1Y";
   let selectedAggregation: AggregationPeriod = "1D";
   let showVolume = true;
   let showVix = true;
@@ -185,6 +185,7 @@
         : displayedHudChange < 0
           ? "text-rose-600"
           : "text-muted-foreground";
+  $: vixTone = (vixPoints.at(-1)?.close ?? 0) >= 20 ? "text-amber-600" : "text-[#7c5cff]";
   $: if (hasLoadedPreferences) {
     savePreferences();
   }
@@ -574,7 +575,7 @@
                         <span class="text-blue-600">Vol {formatChartHudVolume(displayedHudState.quoteVolume, volumeScale)}</span>
                       {/if}
                       {#if displayedHudState.vix !== null}
-                        <span class="text-amber-600">VIX {formatChartHudPrice(displayedHudState.vix)}</span>
+                        <span class={vixTone}>VIX {formatChartHudPrice(displayedHudState.vix)}</span>
                       {/if}
                     </div>
                   {/if}

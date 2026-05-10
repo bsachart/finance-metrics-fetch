@@ -1,6 +1,6 @@
 # finance_metrics_fetch Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2026-04-06
+Auto-generated from all feature plans. Last updated: 2026-05-10
 
 ## Active Technologies
 - TypeScript 5.x, SvelteKit on Node.js 20+ + SvelteKit, `@sveltejs/adapter-static`, `shadcn-svelte`, Lightweight Charts, Papa Parse, Vitest (002-market-ui)
@@ -44,9 +44,9 @@ ui/
 Python 3.12 with type hints: Follow standard conventions and keep dataframe work in Polars, not pandas.
 
 ## Recent Changes
+- 009-fix-chart-colors: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
 - 008-hud-dashboard: Added TypeScript 6.x and Svelte 5 + SvelteKit, Lightweight Charts, existing dashboard data loaders, existing shadcn-svelte primitives
 - 007-command-center-finder: Added TypeScript 5.x and Svelte 5 + SvelteKit, Lightweight Charts, existing dashboard data loaders, existing shadcn-svelte primitives
-- 006-unify-analytics-workspace: Added TypeScript 5.x and Svelte 5 + SvelteKit, Lightweight Charts, existing dashboard data loaders, existing shadcn-svelte primitives
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->
