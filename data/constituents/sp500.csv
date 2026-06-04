@@ -164,7 +164,6 @@ sp500,ELV,Elevance Health,Health Care,Managed Health Care,https://en.wikipedia.o
 sp500,EME,Emcor,Industrials,Construction & Engineering,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,EMR,Emerson Electric,Industrials,Electrical Components & Equipment,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,EOG,EOG Resources,Energy,Oil & Gas Exploration & Production,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
-sp500,EPAM,EPAM Systems,Information Technology,IT Consulting & Other Services,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,EQIX,Equinix,Real Estate,Data Center REITs,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,EQR,Equity Residential,Real Estate,Multi-Family Residential REITs,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,EQT,EQT Corporation,Energy,Oil & Gas Exploration & Production,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
@@ -186,6 +185,7 @@ sp500,FAST,Fastenal,Industrials,Trading Companies & Distributors,https://en.wiki
 sp500,FCX,Freeport-McMoRan,Materials,Copper,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,FDS,FactSet,Financials,Financial Exchanges & Data,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,FDX,FedEx,Industrials,Air Freight & Logistics,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
+sp500,FDXF,FedEx Freight,Industrials,Cargo Ground Transportation,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,FE,FirstEnergy,Utilities,Electric Utilities,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,FFIV,"F5, Inc.",Information Technology,Communications Equipment,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,FICO,Fair Isaac,Information Technology,Application Software,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
