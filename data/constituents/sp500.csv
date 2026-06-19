@@ -111,7 +111,6 @@ sp500,COP,ConocoPhillips,Energy,Oil & Gas Exploration & Production,https://en.wi
 sp500,COR,Cencora,Health Care,Health Care Distributors,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,COST,Costco,Consumer Staples,Consumer Staples Merchandise Retail,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,CPAY,Corpay,Financials,Transaction & Payment Processing Services,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
-sp500,CPB,Campbell's Company (The),Consumer Staples,Packaged Foods & Meats,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,CPRT,Copart,Industrials,Diversified Support Services,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,CPT,Camden Property Trust,Real Estate,Multi-Family Residential REITs,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,CRH,CRH plc,Materials,Construction Materials,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
@@ -193,6 +192,7 @@ sp500,FIS,Fidelity National Information Services,Financials,Transaction & Paymen
 sp500,FISV,Fiserv,Financials,Transaction & Payment Processing Services,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,FITB,Fifth Third Bancorp,Financials,Regional Banks,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,FIX,Comfort Systems USA,Industrials,Construction & Engineering,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
+sp500,FLEX,Flex Ltd.,Information Technology,Electronic Manufacturing Services,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,FOX,Fox Corporation (Class B),Communication Services,Broadcasting,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,FOXA,Fox Corporation (Class A),Communication Services,Broadcasting,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,FRT,Federal Realty Investment Trust,Real Estate,Retail REITs,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
@@ -316,6 +316,7 @@ sp500,MPWR,Monolithic Power Systems,Information Technology,Semiconductors,https:
 sp500,MRK,Merck & Co.,Health Care,Pharmaceuticals,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,MRNA,Moderna,Health Care,Biotechnology,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,MRSH,Marsh McLennan,Financials,Insurance Brokers,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
+sp500,MRVL,Marvell Technology,Information Technology,Semiconductors,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,MS,Morgan Stanley,Financials,Investment Banking & Brokerage,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,MSCI,MSCI Inc.,Financials,Financial Exchanges & Data,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,MSFT,Microsoft,Information Technology,Systems Software,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
@@ -372,7 +373,6 @@ sp500,PNC,PNC Financial Services,Financials,Diversified Banks,https://en.wikiped
 sp500,PNR,Pentair,Industrials,Industrial Machinery & Supplies & Components,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,PNW,Pinnacle West Capital,Utilities,Multi-Utilities,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,PODD,Insulet Corporation,Health Care,Health Care Equipment,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
-sp500,POOL,Pool Corporation,Consumer Discretionary,Distributors,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,PPG,PPG Industries,Materials,Specialty Chemicals,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,PPL,PPL Corporation,Utilities,Electric Utilities,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,PRU,Prudential Financial,Financials,Life & Health Insurance,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
