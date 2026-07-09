@@ -1,7 +1,7 @@
 {
-  "started_at": "2026-07-09T19:21:24.054719+00:00",
-  "finished_at": "2026-07-09T19:21:29.470578+00:00",
-  "status": "success",
+  "started_at": "2026-07-09T21:12:11.136852+00:00",
+  "finished_at": "2026-07-09T21:12:17.715944+00:00",
+  "status": "partial_failure",
   "refreshed_symbols": [
     "VOO",
     "^VIX",
@@ -15,9 +15,11 @@
     "SLV"
   ],
   "failed_symbols": [],
-  "failed_sources": [],
+  "failed_sources": [
+    "nasdaq100"
+  ],
   "messages": [
     "sp500: constituents updated",
-    "nasdaq100: constituents updated"
+    "nasdaq100: No Wikipedia constituent table found for nasdaq100"
   ]
 }
