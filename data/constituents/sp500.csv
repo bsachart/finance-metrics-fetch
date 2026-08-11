@@ -319,7 +319,7 @@ sp500,MRNA,Moderna,Health Care,Biotechnology,https://en.wikipedia.org/wiki/List_
 sp500,MRSH,Marsh McLennan,Financials,Insurance Brokers,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,MRVL,Marvell Technology,Information Technology,Semiconductors,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,MS,Morgan Stanley,Financials,Investment Banking & Brokerage,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
-sp500,MSCI,MSCI Inc.,Financials,Financial Exchanges & Data,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
+sp500,MSCI,MSCI,Financials,Financial Exchanges & Data,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,MSFT,Microsoft,Information Technology,Systems Software,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,MSI,Motorola Solutions,Information Technology,Communications Equipment,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,MTB,M&T Bank,Financials,Regional Banks,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
@@ -351,7 +351,7 @@ sp500,OKE,Oneok,Energy,Oil & Gas Storage & Transportation,https://en.wikipedia.o
 sp500,OMC,Omnicom Group,Communication Services,Advertising,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,ON,ON Semiconductor,Information Technology,Semiconductors,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,ORCL,Oracle Corporation,Information Technology,Application Software,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
-sp500,ORLY,O’Reilly Automotive,Consumer Discretionary,Automotive Retail,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
+sp500,ORLY,O'Reilly Automotive,Consumer Discretionary,Automotive Retail,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,OTIS,Otis Worldwide,Industrials,Industrial Machinery & Supplies & Components,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,OXY,Occidental Petroleum,Energy,Oil & Gas Exploration & Production,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,PANW,Palo Alto Networks,Information Technology,Systems Software,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
@@ -391,7 +391,7 @@ sp500,REGN,Regeneron Pharmaceuticals,Health Care,Biotechnology,https://en.wikipe
 sp500,RF,Regions Financial Corporation,Financials,Regional Banks,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,RJF,Raymond James Financial,Financials,Investment Banking & Brokerage,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,RL,Ralph Lauren Corporation,Consumer Discretionary,"Apparel, Accessories & Luxury Goods",https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
-sp500,RMD,ResMed,Health Care,Health Care Equipment,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
+sp500,RMD,ResMed |,Health Care,Health Care Equipment,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,ROK,Rockwell Automation,Industrials,Electrical Components & Equipment,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,ROL,"Rollins, Inc.",Industrials,Environmental & Facilities Services,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,ROP,Roper Technologies,Information Technology,Electronic Equipment & Instruments,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
