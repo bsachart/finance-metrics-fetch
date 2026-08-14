@@ -1,8 +1,9 @@
 {
-  "started_at": "2026-08-14T08:57:13.783548+00:00",
-  "finished_at": "2026-08-14T08:57:18.208068+00:00",
+  "started_at": "2026-08-14T10:48:22.373322+00:00",
+  "finished_at": "2026-08-14T10:48:26.669998+00:00",
   "status": "partial_failure",
   "refreshed_symbols": [
+    "VOO",
     "^VIX",
     "VIRT",
     "GOOGL",
@@ -13,15 +14,11 @@
     "GLD",
     "SLV"
   ],
-  "failed_symbols": [
-    "VOO"
-  ],
+  "failed_symbols": [],
   "failed_sources": [
-    "nasdaq100",
-    "yahoo_finance"
+    "nasdaq100"
   ],
   "messages": [
-    "VOO: Too Many Requests. Rate limited. Try after a while.",
     "sp500: constituents updated",
     "nasdaq100: No Wikipedia constituent table found for nasdaq100"
   ]
