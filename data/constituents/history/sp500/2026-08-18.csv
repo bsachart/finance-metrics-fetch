@@ -162,7 +162,6 @@ sp500,EME,Emcor,Industrials,Construction & Engineering,https://en.wikipedia.org/
 sp500,EMR,Emerson Electric,Industrials,Electrical Components & Equipment,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,EOG,EOG Resources,Energy,Oil & Gas Exploration & Production,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,EQIX,Equinix,Real Estate,Data Center REITs,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
-sp500,EQR,Equity Residential,Real Estate,Multi-Family Residential REITs,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,EQT,EQT Corporation,Energy,Oil & Gas Exploration & Production,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,ERIE,Erie Indemnity,Financials,Insurance Brokers,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,ES,Eversource Energy,Utilities,Electric Utilities,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
@@ -385,6 +384,7 @@ sp500,PYPL,PayPal,Financials,Transaction & Payment Processing Services,https://e
 sp500,Q,Qnity Electronics,Information Technology,Semiconductor Materials & Equipment,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,QCOM,Qualcomm,Information Technology,Semiconductors,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,RCL,Royal Caribbean Group,Consumer Discretionary,"Hotels, Resorts & Cruise Lines",https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
+sp500,RDDT,Reddit,Communication Services,,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,REG,Regency Centers,Real Estate,Retail REITs,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,REGN,Regeneron Pharmaceuticals,Health Care,Biotechnology,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,RF,Regions Financial Corporation,Financials,Regional Banks,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
@@ -468,6 +468,7 @@ sp500,VICI,Vici Properties,Real Estate,Hotel & Resort REITs,https://en.wikipedia
 sp500,VLO,Valero Energy,Energy,Oil & Gas Refining & Marketing,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,VLTO,Veralto,Industrials,Environmental & Facilities Services,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,VMC,Vulcan Materials Company,Materials,Construction Materials,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
+sp500,VMRK,Vivmark Residential,Real Estate,Multi-Family Residential REITs,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,VRSK,Verisk Analytics,Industrials,Research & Consulting Services,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,VRSN,Verisign,Information Technology,Internet Services & Infrastructure,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,VRT,Vertiv,Industrials,Electrical Components & Equipment,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
