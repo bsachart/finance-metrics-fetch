@@ -120,7 +120,6 @@ sp500,CSGP,CoStar Group,Real Estate,Real Estate Services,https://en.wikipedia.or
 sp500,CSX,CSX Corporation,Industrials,Rail Transportation,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,CTAS,Cintas,Industrials,Diversified Support Services,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,CTSH,Cognizant,Information Technology,IT Consulting & Other Services,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
-sp500,CTVA,Corteva,Materials,Fertilizers & Agricultural Chemicals,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,CVNA,Carvana,Consumer Discretionary,Automotive Retail,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,CVS,CVS Health,Health Care,Health Care Services,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,CVX,Chevron Corporation,Energy,Integrated Oil & Gas,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
@@ -378,7 +377,6 @@ sp500,PPG,PPG Industries,Materials,Specialty Chemicals,https://en.wikipedia.org/
 sp500,PPL,PPL Corporation,Utilities,Electric Utilities,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,PRU,Prudential Financial,Financials,Life & Health Insurance,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,PSA,Public Storage,Real Estate,Self-Storage REITs,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
-sp500,PSKY,Paramount Skydance Corporation,Communication Services,Movies & Entertainment,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,PSX,Phillips 66,Energy,Oil & Gas Refining & Marketing,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,PTC,PTC Inc.,Information Technology,Application Software,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,PWR,Quanta Services,Industrials,Construction & Engineering,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
@@ -405,6 +403,7 @@ sp500,SBUX,Starbucks,Consumer Discretionary,Restaurants,https://en.wikipedia.org
 sp500,SCHW,Charles Schwab Corporation,Financials,Investment Banking & Brokerage,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,SHW,Sherwin-Williams,Materials,Specialty Chemicals,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,SJM,J.M. Smucker Company (The),Consumer Staples,Packaged Foods & Meats,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
+sp500,SKYD,Paramount Skydance Corporation,Communication Services,Movies & Entertainment,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,SLB,Schlumberger,Energy,Oil & Gas Equipment & Services,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,SMCI,Supermicro,Information Technology,"Technology Hardware, Storage & Peripherals",https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,SNA,Snap-on,Industrials,Industrial Machinery & Supplies & Components,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
@@ -449,6 +448,7 @@ sp500,TSLA,"Tesla, Inc.",Consumer Discretionary,Automobile Manufacturers,https:/
 sp500,TSN,Tyson Foods,Consumer Staples,Packaged Foods & Meats,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,TT,Trane Technologies,Industrials,Building Products,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,TTWO,Take-Two Interactive,Communication Services,Interactive Home Entertainment,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
+sp500,TWLO,Twilio,Information Technology,Systems Software,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,TXN,Texas Instruments,Information Technology,Semiconductors,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,TXT,Textron,Industrials,Aerospace & Defense,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,TYL,Tyler Technologies,Information Technology,Application Software,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
@@ -476,10 +476,10 @@ sp500,VRTX,Vertex Pharmaceuticals,Health Care,Biotechnology,https://en.wikipedia
 sp500,VST,Vistra Corp .,Utilities,Electric Utilities,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,VTR,Ventas,Real Estate,Health Care REITs,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,VTRS,Viatris,Health Care,Pharmaceuticals,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
+sp500,VYLR,Vylor,Consumer Staples,Agricultural Products & Services,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,VZ,Verizon,Communication Services,Integrated Telecommunication Services,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,WAB,Wabtec,Industrials,Construction Machinery & Heavy Transportation Equipment,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,WAT,Waters Corporation,Health Care,Life Sciences Tools & Services,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
-sp500,WBD,Warner Bros. Discovery,Communication Services,Broadcasting,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,WDAY,"Workday, Inc.",Information Technology,Application Software,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,WDC,Western Digital,Information Technology,"Technology Hardware, Storage & Peripherals",https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 sp500,WEC,WEC Energy Group,Utilities,Electric Utilities,https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
